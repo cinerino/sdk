@@ -62,16 +62,18 @@ async function main() {
     // インセンティブ付与に使用するポイント口座を決定する
     let pointAccount;
     console.log('searching pointAccounts...');
-    let pointAccounts = await personService.searchPointAccounts({
-        personId: 'me'
-    });
+    let pointAccounts = await personService.searchAccounts({
+        personId: 'me',
+        accountType: client.factory.accountType.Point
+    }).then((ownershipInfos) => ownershipInfos.map((o) => o.typeOfGood));
     pointAccounts = pointAccounts.filter((a) => a.status === client.factory.pecorino.accountStatusType.Opened);
     if (pointAccounts.length === 0) {
         console.log('opening pointAccount...');
-        pointAccount = await personService.openPointAccount({
+        pointAccount = await personService.openAccount({
             personId: 'me',
-            name: loginTicket.getUsername()
-        });
+            name: loginTicket.getUsername(),
+            accountType: client.factory.accountType.Point
+        }).then((ownershipInfo) => ownershipInfo.typeOfGood);
         console.log('pointAccount opened', pointAccount.accountNumber);
     } else {
         pointAccount = pointAccounts[0];
