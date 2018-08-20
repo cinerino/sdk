@@ -27,58 +27,35 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    // const programMembershipService = new client.service.ProgramMembership({
-    //     endpoint: process.env.API_ENDPOINT,
-    //     auth: auth
-    // });
+    const ownershipInfoService = new client.service.OwnershipInfo({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient
+    });
 
     console.log('finding contact...');
     const contact = await personService.getContacts({ personId: 'me' });
     console.log('contact found');
 
-    // 取引に使用するクレジットカードを決定する
-    let creditCard;
-    console.log('searching credit cards...');
-    let creditCards = await personService.searchCreditCards({
-        personId: 'me'
-    });
-    creditCards = creditCards.filter((c) => c.deleteFlag === '0');
-    if (creditCards.length === 0) {
-        console.log('adding credit card...');
-        creditCard = await personService.addCreditCard({
-            personId: 'me',
-            creditCard: {
-                cardNo: '4111111111111111',
-                expire: '2020',
-                holderName: 'AA BB'
-            }
-        });
-        console.log('credit card added', creditCard.cardSeq);
-    } else {
-        creditCard = creditCards[0];
-    }
-    console.log('using credit card...', creditCard.cardSeq);
-
-    // インセンティブ付与に使用するポイント口座を決定する
-    let account;
+    // 決済に使用するコイン口座を決定する
+    let accountOwnershipInfo;
     console.log('searching accounts...');
-    let accounts = await personService.searchAccounts({
+    let accountOwnershipInfos = await personService.searchAccounts({
         personId: 'me',
         accountType: client.factory.accountType.Coin
-    }).then((ownershipInfos) => ownershipInfos.map((o) => o.typeOfGood));
-    accounts = accounts.filter((a) => a.status === client.factory.pecorino.accountStatusType.Opened);
-    if (accounts.length === 0) {
+    });
+    accountOwnershipInfos = accountOwnershipInfos.filter((a) => a.typeOfGood.status === client.factory.pecorino.accountStatusType.Opened);
+    if (accountOwnershipInfos.length === 0) {
         console.log('opening account...');
-        account = await personService.openAccount({
+        accountOwnershipInfo = await personService.openAccount({
             personId: 'me',
             name: loginTicket.getUsername(),
             accountType: client.factory.accountType.Coin
-        }).then((ownershipInfo) => ownershipInfo.typeOfGood);
-        console.log('account opened', account.accountNumber);
+        });
+        console.log('account opened', accountOwnershipInfo.typeOfGood.accountNumber);
     } else {
-        account = accounts[0];
+        accountOwnershipInfo = accountOwnershipInfos[0];
     }
-    console.log('your coin balance is', account.balance);
+    console.log('your coin balance is', accountOwnershipInfo.typeOfGood.balance);
 
     // 販売劇場検索
     const sellers = await organizationService.searchMovieTheaters({});
@@ -159,13 +136,24 @@ async function main() {
     });
     console.log('seat reservation authorized', seatReservationAuth.id);
 
-    // クレジットカードオーソリアクション
-    console.log('authorizing account payment...');
+    // 口座にコード発行
+    const { code } = await personService.authorizeOwnershipInfo({
+        personId: 'me',
+        goodType: client.factory.ownershipInfo.AccountGoodType.Account,
+        identifier: accountOwnershipInfo.identifier
+    });
+    // 口座所有権をトークン化
+    const { token } = await ownershipInfoService.getToken({ code });
+    // 口座オーソリアクション
+    console.log('authorizing account payment...', token);
     const paymentAuth = await placeOrderService.authorizeAccountPayment({
         transactionId: transaction.id,
         amount: seatReservationAuth.result.price,
-        accountType: client.factory.accountType.Coin,
-        fromAccountNumber: account.accountNumber
+        // fromAccount: {
+        //     accountType: client.factory.accountType.Coin,
+        //     accountNumber: accountOwnershipInfo.typeOfGood.accountNumber
+        // }
+        fromAccount: token
     });
     console.log('account payment authorized', paymentAuth.id);
 
