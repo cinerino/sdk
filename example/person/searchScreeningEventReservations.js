@@ -1,8 +1,8 @@
 /**
  * 上映イベント予約検索
  */
-const auth = require('./auth');
-const client = require('../lib/index');
+const auth = require('../auth');
+const client = require('../../lib/index');
 
 async function main() {
     const authClient = await auth.login();

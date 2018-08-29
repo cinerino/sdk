@@ -67,9 +67,8 @@ async function main() {
     // イベント検索
     const screeningEvents = await eventService.searchScreeningEvents({
         // superEventLocationIdentifiers: [seller.identifier],
-        startFrom: moment().toDate(),
-        // tslint:disable-next-line:no-magic-numbers
-        startThrough: moment().add(1, 'week').toDate()
+        inSessionFrom: moment().toDate(),
+        inSessionThrough: moment().add(1, 'week').toDate()
     });
     console.log(screeningEvents.length, 'events found');
 
