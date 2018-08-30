@@ -15,11 +15,11 @@ async function main() {
         auth: authClient
     });
 
-    const reservations = await personService.searchScreeningEventReservations({
+    const { totalCount, data } = await personService.searchScreeningEventReservations({
         personId: 'me'
     });
-    console.log(reservations);
-    console.log(reservations.length, 'reservations found');
+    console.log(totalCount, 'reservations found');
+    console.log(data.length, 'reservations returned');
 }
 
 main().then(() => {

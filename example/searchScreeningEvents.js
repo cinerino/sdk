@@ -1,6 +1,8 @@
 /**
  * 上映イベント検索
  */
+const moment = require('moment');
+
 const auth = require('./auth');
 const client = require('../lib/index');
 
@@ -15,10 +17,14 @@ async function main() {
         auth: authClient
     });
 
-    const event = await eventService.findScreeningEventById({
-        eventId: '7i9929cjkwm8ebp'
+    const { totalCount, data } = await eventService.searchScreeningEvents({
+        inSessionFrom: moment().toDate(),
+        inSessionThrough: moment().add(1, 'week').toDate(),
+        // limit: 50,
+        // page: 1
     });
-    console.log(event);
+    console.log(totalCount, 'events found');
+    console.log(data.length, 'events returned');
 }
 
 main().then(() => {

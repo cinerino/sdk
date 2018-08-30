@@ -15,13 +15,15 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    const orders = await personService.searchOrders({
+    const { totalCount, data } = await personService.searchOrders({
         personId: 'me',
-        orderDateFrom: moment().add(-1, 'week').toDate(),
-        orderDateThrough: moment().toDate()
+        orderDateFrom: moment().add(-1, 'month').toDate(),
+        orderDateThrough: moment().toDate(),
+        limit: 10,
+        page: 1
     });
-    console.log(orders);
-    console.log(orders.length, 'orders found');
+    console.log(totalCount, 'orders found');
+    console.log(data.length, 'orders returned');
 }
 
 main().then(() => {
