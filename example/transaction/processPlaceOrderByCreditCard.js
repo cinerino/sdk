@@ -27,10 +27,10 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    // const programMembershipService = new client.service.ProgramMembership({
-    //     endpoint: process.env.API_ENDPOINT,
-    //     auth: auth
-    // });
+    const personOwnershipInfoService = new client.service.person.OwnershipInfo({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient
+    });
 
     console.log('finding contact...');
     const contact = await personService.getContacts({ personId: 'me' });
@@ -39,7 +39,7 @@ async function main() {
     // 取引に使用するクレジットカードを決定する
     let creditCard;
     console.log('searching credit cards...');
-    let creditCards = await personService.searchCreditCards({
+    let creditCards = await personOwnershipInfoService.searchCreditCards({
         personId: 'me'
     });
     creditCards = creditCards.filter((c) => c.deleteFlag === '0');
@@ -62,14 +62,19 @@ async function main() {
     // インセンティブ付与に使用するポイント口座を決定する
     let pointAccount;
     console.log('searching pointAccounts...');
-    let pointAccounts = await personService.searchAccounts({
+    const searchAccountsResult = await personOwnershipInfoService.search({
         personId: 'me',
-        accountType: client.factory.accountType.Point
-    }).then((ownershipInfos) => ownershipInfos.map((o) => o.typeOfGood));
-    pointAccounts = pointAccounts.filter((a) => a.status === client.factory.pecorino.accountStatusType.Opened);
+        typeOfGood: {
+            typeOf: client.factory.ownershipInfo.AccountGoodType.Account,
+            accountType: client.factory.accountType.Point
+        }
+    });
+    const pointAccounts = searchAccountsResult.data
+        .map((o) => o.typeOfGood)
+        .filter((a) => a.status === client.factory.pecorino.accountStatusType.Opened);
     if (pointAccounts.length === 0) {
         console.log('opening pointAccount...');
-        pointAccount = await personService.openAccount({
+        pointAccount = await personOwnershipInfoService.openAccount({
             personId: 'me',
             name: loginTicket.getUsername(),
             accountType: client.factory.accountType.Point
@@ -81,8 +86,8 @@ async function main() {
     console.log('your point balance is', pointAccount.balance);
 
     // 販売劇場検索
-    const sellers = await organizationService.searchMovieTheaters({});
-    const seller = sellers[0];
+    const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
+    const seller = searchMovieTheatersResult.data[0];
     if (seller === undefined) {
         throw new Error('No seller');
     }
@@ -112,14 +117,14 @@ async function main() {
     // }
 
     // イベント検索
-    const screeningEvents = await eventService.searchScreeningEvents({
+    const searchScreeningEventsResult = await eventService.searchScreeningEvents({
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'week').toDate()
     });
-    console.log(screeningEvents.length, 'events found');
+    console.log(searchScreeningEventsResult.totalCount, 'events found');
 
-    const availableEvents = screeningEvents;
+    const availableEvents = searchScreeningEventsResult.data;
     // const availableEvents = screeningEvents.filter(
     //     (event) => (event.offer.availability !== 0)
     // );

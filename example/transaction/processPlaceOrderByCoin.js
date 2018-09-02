@@ -27,6 +27,10 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
+    const personOwnershipInfoService = new client.service.person.OwnershipInfo({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient
+    });
     const ownershipInfoService = new client.service.OwnershipInfo({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
@@ -39,14 +43,18 @@ async function main() {
     // 決済に使用するコイン口座を決定する
     let accountOwnershipInfo;
     console.log('searching accounts...');
-    let accountOwnershipInfos = await personService.searchAccounts({
+    const searchAccountsResult = await personOwnershipInfoService.search({
         personId: 'me',
-        accountType: client.factory.accountType.Coin
+        typeOfGood: {
+            typeOf: client.factory.ownershipInfo.AccountGoodType.Account,
+            accountType: client.factory.accountType.Coin
+        }
     });
-    accountOwnershipInfos = accountOwnershipInfos.filter((a) => a.typeOfGood.status === client.factory.pecorino.accountStatusType.Opened);
+    const accountOwnershipInfos = searchAccountsResult.data
+        .filter((a) => a.typeOfGood.status === client.factory.pecorino.accountStatusType.Opened);
     if (accountOwnershipInfos.length === 0) {
         console.log('opening account...');
-        accountOwnershipInfo = await personService.openAccount({
+        accountOwnershipInfo = await personOwnershipInfoService.openAccount({
             personId: 'me',
             name: loginTicket.getUsername(),
             accountType: client.factory.accountType.Coin
@@ -58,21 +66,21 @@ async function main() {
     console.log('your coin balance is', accountOwnershipInfo.typeOfGood.balance);
 
     // 販売劇場検索
-    const sellers = await organizationService.searchMovieTheaters({});
-    const seller = sellers[0];
+    const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
+    const seller = searchMovieTheatersResult.data[0];
     if (seller === undefined) {
         throw new Error('No seller');
     }
 
     // イベント検索
-    const screeningEvents = await eventService.searchScreeningEvents({
+    const searchScreeningEventsResult = await eventService.searchScreeningEvents({
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'week').toDate()
     });
-    console.log(screeningEvents.length, 'events found');
+    console.log(searchScreeningEventsResult.totalCount, 'events found');
 
-    const availableEvents = screeningEvents;
+    const availableEvents = searchScreeningEventsResult.data;
     // const availableEvents = screeningEvents.filter(
     //     (event) => (event.offer.availability !== 0)
     // );
@@ -136,10 +144,9 @@ async function main() {
     console.log('seat reservation authorized', seatReservationAuth.id);
 
     // 口座にコード発行
-    const { code } = await personService.authorizeOwnershipInfo({
+    const { code } = await personOwnershipInfoService.authorize({
         personId: 'me',
-        goodType: client.factory.ownershipInfo.AccountGoodType.Account,
-        identifier: accountOwnershipInfo.identifier
+        ownershipInfoId: accountOwnershipInfo.id
     });
     // 口座所有権をトークン化
     const { token } = await ownershipInfoService.getToken({ code });

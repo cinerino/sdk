@@ -22,7 +22,7 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    const { code } = await personService.authorizeOwnershipInfo({
+    const { code } = await personService.authorize({
         personId: 'me',
         goodType: client.factory.chevre.reservationType.EventReservation,
         identifier: 'EventReservation-MO118-180819-000002-1'

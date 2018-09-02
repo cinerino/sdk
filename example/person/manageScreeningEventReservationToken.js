@@ -1,6 +1,8 @@
 /**
  * 上映イベント予約検索
  */
+const moment = require('moment');
+
 const auth = require('../auth');
 const client = require('../../lib/index');
 
@@ -10,7 +12,7 @@ async function main() {
     const loginTicket = authClient.verifyIdToken({});
     console.log('username is', loginTicket.getUsername());
 
-    const personService = new client.service.Person({
+    const personOwnershipInfoService = new client.service.person.OwnershipInfo({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
@@ -23,18 +25,26 @@ async function main() {
         auth: authClient
     });
 
-    const reservations = await personService.searchScreeningEventReservations({
-        personId: 'me'
+    const searchScreeningEventReservationsResult = await personOwnershipInfoService.search({
+        personId: 'me',
+        ownedFrom: moment().add(-20, 'days').toDate(),
+        ownedThrough: moment().toDate(),
+        sort: {
+            ownedFrom: client.factory.sortType.Descending
+        },
+        typeOfGood: {
+            typeOf: client.factory.chevre.reservationType.EventReservation
+        }
     });
-    console.log(reservations);
-    console.log(reservations.length, 'reservations found');
-    let ownershipInfo = reservations[0];
+    console.log(searchScreeningEventReservationsResult.totalCount, 'reservations found');
+    console.log(searchScreeningEventReservationsResult.data.length, 'reservations returned');
+    const reservationOwnershipInfo = searchScreeningEventReservationsResult.data[0];
+    let reservation = reservationOwnershipInfo.typeOfGood;
 
     console.log('publishing code...');
-    const { code } = await personService.authorizeOwnershipInfo({
+    const { code } = await personOwnershipInfoService.authorize({
         personId: 'me',
-        identifier: ownershipInfo.identifier,
-        goodType: ownershipInfo.typeOfGood.typeOf
+        ownershipInfoId: reservationOwnershipInfo.id
     })
     console.log('code published', code);
 
@@ -45,7 +55,7 @@ async function main() {
     console.log('token created', token);
 
     console.log('checking token...');
-    ownershipInfo = await reservationService.findScreeningEventReservationByToken({ token: token });
+    reservation = await reservationService.findScreeningEventReservationByToken({ token: token });
     console.log('token is valid');
 }
 
