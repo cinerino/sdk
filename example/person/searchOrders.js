@@ -19,9 +19,13 @@ async function main() {
         personId: 'me',
         orderDateFrom: moment().add(-1, 'month').toDate(),
         orderDateThrough: moment().toDate(),
-        limit: 10,
-        page: 1
+        limit: 20,
+        page: 1,
+        sort: {
+            orderDate: client.factory.sortType.Descending
+        }
     });
+    console.log(data.map((o) => o.orderDate).join('\n'));
     console.log(totalCount, 'orders found');
     console.log(data.length, 'orders returned');
 }
