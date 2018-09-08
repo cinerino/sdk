@@ -1,5 +1,5 @@
 /**
- * ユーザー認証
+ * 管理者ユーザー認証
  */
 const open = require('open');
 const readline = require('readline');
@@ -7,9 +7,9 @@ const client = require('../lib/');
 
 exports.login = async function () {
     const auth = new client.auth.OAuth2({
-        domain: process.env.TEST_AUTHORIZE_SERVER_DOMAIN,
-        clientId: process.env.TEST_CLIENT_ID,
-        clientSecret: process.env.TEST_CLIENT_SECRET,
+        domain: process.env.TEST_ADMIN_AUTHORIZE_SERVER_DOMAIN,
+        clientId: process.env.TEST_ADMIN_CLIENT_ID,
+        clientSecret: process.env.TEST_ADMIN_CLIENT_SECRET,
         redirectUri: 'https://localhost/signIn',
         logoutUri: 'https://localhost/signOut'
     });

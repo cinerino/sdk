@@ -15,12 +15,12 @@ async function main() {
         auth: authClient
     });
     const order = await orderService.findByConfirmationNumber({
-        confirmationNumber: 12345,
+        confirmationNumber: 2,
         customer: {
             telephone: '+819012345678'
         }
     });
-    console.log('order found', order.orderDate);
+    console.log('order found', order.orderDate, order.orderNumber);
 }
 
 main().then(() => {
