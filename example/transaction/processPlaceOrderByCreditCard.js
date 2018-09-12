@@ -243,11 +243,25 @@ async function main() {
     // console.log('取引を中止しました。');
 
     console.log('confirming transaction...');
-    const result = await placeOrderService.confirm({
+    let result = await placeOrderService.confirm({
         transactionId: transaction.id,
         sendEmailMessage: true
     });
-    console.log('transaction confirmed');
+    console.log('transaction confirmed', result.order.orderNumber);
+    // 何度確定をコールしても冪等
+    console.log('confirming transaction...');
+    result = await placeOrderService.confirm({
+        transactionId: transaction.id,
+        sendEmailMessage: true
+    });
+    console.log('transaction confirmed', result.order.orderNumber);
+    // 何度確定をコールしても冪等
+    console.log('confirming transaction...');
+    result = await placeOrderService.confirm({
+        transactionId: transaction.id,
+        sendEmailMessage: true
+    });
+    console.log('transaction confirmed', result.order.orderNumber);
 }
 
 async function wait(waitInMilliseconds) {
