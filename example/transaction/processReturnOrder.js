@@ -2,7 +2,7 @@
  * 注文返品プロセス
  */
 const moment = require('moment');
-const auth = require('../auth');
+const auth = require('../authAsAdmin');
 const client = require('../../lib/index');
 
 async function main() {
@@ -18,7 +18,7 @@ async function main() {
 
     const transaction = await returnOrderService.start({
         expires: moment().add(30, 'minutes').toDate(),
-        transactionId: '5b73f94c8f9ec01bc0ff74b9'
+        transactionId: '5b99f448a63c64266ca886d5'
     });
     console.log('transaction started', transaction.id);
 
