@@ -36,9 +36,9 @@ async function main() {
         auth: authClient
     });
 
-    console.log('finding contact...');
-    const contact = await personService.getContacts({ personId: 'me' });
-    console.log('contact found');
+    console.log('finding profile...');
+    const profile = await personService.getProfile({ personId: 'me' });
+    console.log('profile found');
 
     // 決済に使用するコイン口座を決定する
     let accountOwnershipInfo;
@@ -174,7 +174,7 @@ async function main() {
             givenName: 'Taro',
             familyName: 'Motion',
             telephone: '+819012345678s',
-            email: contact.email
+            email: profile.email
         }
     });
     console.log('customer contact set');

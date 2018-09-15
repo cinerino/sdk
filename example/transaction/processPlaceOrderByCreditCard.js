@@ -32,9 +32,9 @@ async function main() {
         auth: authClient
     });
 
-    console.log('finding contact...');
-    const contact = await personService.getContacts({ personId: 'me' });
-    console.log('contact found');
+    console.log('finding profile...');
+    const profile = await personService.getProfile({ personId: 'me' });
+    console.log('profile found');
 
     // 取引に使用するクレジットカードを決定する
     let creditCard;
@@ -218,8 +218,8 @@ async function main() {
         contact: {
             givenName: 'Taro',
             familyName: 'Motion',
-            telephone: '+819012345678s',
-            email: contact.email
+            telephone: '+819012345678',
+            email: profile.email
         }
     });
     console.log('customer contact set');
