@@ -167,7 +167,7 @@ async function main() {
 
     await wait(5000);
     console.log('authorizing seat reservation...');
-    const seatReservationAuth = await placeOrderService.authorizeSeatReservation({
+    let seatReservationAuth = await placeOrderService.authorizeSeatReservation({
         transactionId: transaction.id,
         event: {
             id: screeningEvent.id
@@ -187,9 +187,14 @@ async function main() {
     });
     console.log('seat reservation authorized', seatReservationAuth.id);
 
+    // await wait(5000);
+    // console.log('voiding seat reservation auth...');
+    // await placeOrderService.voidSeatReservation({ transactionId: transaction.id, actionId: seatReservationAuth.id });
+    // console.log('seat reservation auth voided');
+
     // クレジットカードオーソリアクション
     console.log('authorizing credit card payment...');
-    const creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
+    let creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
         transactionId: transaction.id,
         amount: seatReservationAuth.result.price,
         // amount: ticketType.charge,
@@ -205,6 +210,26 @@ async function main() {
         //     expire: '2412',
         //     holderName: 'AA BB'
         // }
+    });
+    console.log('credit card payment authorized', creditCardPaymentAuth.id);
+
+    await wait(5000);
+
+    console.log('voiding credit card auth...');
+    await placeOrderService.voidCreditCardPayment({ transactionId: transaction.id, actionId: creditCardPaymentAuth.id });
+    console.log('credit card auth voided');
+
+    console.log('authorizing credit card payment...');
+    creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
+        transactionId: transaction.id,
+        amount: seatReservationAuth.result.price,
+        // amount: ticketType.charge,
+        orderId: moment().unix(),
+        method: '1',
+        creditCard: {
+            memberId: 'me',
+            cardSeq: creditCard.cardSeq
+        }
     });
     console.log('credit card payment authorized', creditCardPaymentAuth.id);
 
