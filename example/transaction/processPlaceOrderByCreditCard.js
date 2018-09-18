@@ -135,8 +135,20 @@ async function main() {
 
     console.log('starting transaction...');
     const transaction = await placeOrderService.start({
-        expires: moment().add(30, 'minutes').toDate(),
-        sellerId: seller.id
+        expires: moment().add(10, 'minutes').toDate(),
+        agent: {
+            identifier: [
+                {
+                    name: 'SampleName',
+                    value: 'SampleValue'
+                }
+            ]
+        },
+        seller: {
+            typeOf: seller.typeOf,
+            id: seller.id
+        },
+        object: {}
     });
     console.log('transaction started', transaction.id);
 
@@ -296,3 +308,5 @@ async function wait(waitInMilliseconds) {
 main().then(() => {
     console.log('success!');
 }).catch(console.error);
+
+exports.main = main;

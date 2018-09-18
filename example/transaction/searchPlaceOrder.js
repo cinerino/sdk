@@ -22,9 +22,17 @@ async function main() {
         // ids: ['5b7a17bf3920b61e7c354a82'],
         // statuses: [client.factory.transactionStatusType.Confirmed],
         // agent: {
-        //     ids: ['fb6a8b9d-cf90-4608-80ac-4ebc7b8ae7f3']
+        //     ids: ['fb6a8b9d-cf90-4608-80ac-4ebc7b8ae7f3'],
+        //     typeOf: client.factory.personType.Person,
+        //     identifiers: [
+        //         {
+        //             name: 'SampleName',
+        //             value: 'SampleValue'
+        //         }
+        //     ]
         // },
         // seller: {
+        //     typeOf: client.factory.organizationType.MovieTheater,
         //     ids: ['59d20831e53ebc2b4e774466']
         // },
         // object: {

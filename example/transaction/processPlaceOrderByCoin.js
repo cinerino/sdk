@@ -92,7 +92,11 @@ async function main() {
     console.log('starting transaction...');
     const transaction = await placeOrderService.start({
         expires: moment().add(30, 'minutes').toDate(),
-        sellerId: seller.id
+        seller: {
+            typeOf: seller.typeOf,
+            id: seller.id
+        },
+        object: {}
     });
     console.log('transaction started', transaction.id);
 
