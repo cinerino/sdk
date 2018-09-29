@@ -2,6 +2,7 @@
  * クレジットカード決済による注文プロセス
  */
 const moment = require('moment');
+const request = require('request-promise-native');
 const auth = require('../auth');
 const client = require('../../lib/index');
 
@@ -133,6 +134,20 @@ async function main() {
     }
     const screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
 
+    // WAITER許可証
+    const passportToken = await request.post(
+        `${process.env.WAITER_ENDPOINT}/passports`,
+        {
+            body: {
+                scope: `Transaction:PlaceOrder:${seller.id}`
+            },
+            json: true
+        }
+    ).then((body) => body.token).catch((err) => {
+        throw new Error(err.message);
+    });
+    console.log('passportToken published', passportToken);
+
     console.log('starting transaction...');
     const transaction = await placeOrderService.start({
         expires: moment().add(10, 'minutes').toDate(),
@@ -148,7 +163,9 @@ async function main() {
             typeOf: seller.typeOf,
             id: seller.id
         },
-        object: {}
+        object: {
+            passport: { token: passportToken }
+        }
     });
     console.log('transaction started', transaction.id);
 
