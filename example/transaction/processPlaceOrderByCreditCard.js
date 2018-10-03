@@ -88,10 +88,11 @@ async function main() {
 
     // 販売劇場検索
     const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
-    const seller = searchMovieTheatersResult.data[0];
+    const seller = searchMovieTheatersResult.data[Math.floor(searchMovieTheatersResult.data.length * Math.random())];
     if (seller === undefined) {
         throw new Error('No seller');
     }
+    console.log('ordering from seller...', seller.name.ja);
 
     /*****************************************************************
      * 会員としてポイントサービス特典を受けるためには、さらに会員プログラムへの登録処理が必要
@@ -121,7 +122,8 @@ async function main() {
     const searchScreeningEventsResult = await eventService.searchScreeningEvents({
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
-        inSessionThrough: moment().add(1, 'week').toDate()
+        inSessionThrough: moment().add(1, 'week').toDate(),
+        superEvent: { locationBranchCodes: [seller.location.branchCode] }
     });
     console.log(searchScreeningEventsResult.totalCount, 'events found');
 
@@ -135,18 +137,18 @@ async function main() {
     const screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
 
     // WAITER許可証
-    const passportToken = await request.post(
-        `${process.env.WAITER_ENDPOINT}/passports`,
-        {
-            body: {
-                scope: `Transaction:PlaceOrder:${seller.id}`
-            },
-            json: true
-        }
-    ).then((body) => body.token).catch((err) => {
-        throw new Error(err.message);
-    });
-    console.log('passportToken published', passportToken);
+    // const passportToken = await request.post(
+    //     `${process.env.WAITER_ENDPOINT}/passports`,
+    //     {
+    //         body: {
+    //             scope: `Transaction:PlaceOrder:${seller.id}`
+    //         },
+    //         json: true
+    //     }
+    // ).then((body) => body.token).catch((err) => {
+    //     throw new Error(err.message);
+    // });
+    // console.log('passportToken published', passportToken);
 
     console.log('starting transaction...');
     const transaction = await placeOrderService.start({
@@ -164,7 +166,7 @@ async function main() {
             id: seller.id
         },
         object: {
-            passport: { token: passportToken }
+            // passport: { token: passportToken }
         }
     });
     console.log('transaction started', transaction.id);
