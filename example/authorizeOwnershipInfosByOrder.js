@@ -83,15 +83,16 @@ async function main() {
     const isAvailable = availableReservation !== undefined;
     console.log('is available?', isAvailable);
 
-    // トークンのチェック履歴を検索
-    console.log('searching check token actions...');
-    const checkTokenActions = await ownershipInfoService.searchCheckTokenActions({ id: payload.id });
-    console.log(checkTokenActions.length, 'checkTokenActions found');
-
     // ベストエフォートでトークンをリモートチェック(チェックすれば履歴が残る)
     console.log('checking token...');
     await reservationService.findScreeningEventReservationByToken({ token: token });
     console.log('token is valid');
+
+    // トークンのチェック履歴を検索
+    console.log('searching check token actions...');
+    const searchCheckActionsResult = await ownershipInfoService.searchCheckTokenActions({ id: payload.id });
+    console.log(searchCheckActionsResult.totalCount, 'checkTokenActions found');
+    console.log(searchCheckActionsResult.data.length, 'checkTokenActions returned');
     // ここまで管理者ユーザー
 }
 
