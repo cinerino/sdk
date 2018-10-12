@@ -2,7 +2,6 @@
  * クレジットカード決済による注文プロセス
  */
 const moment = require('moment');
-const request = require('request-promise-native');
 const auth = require('../auth');
 const client = require('../../lib/index');
 
@@ -172,8 +171,14 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     // 券種検索
-    const ticketTypes = await eventService.searchScreeningEventTicketTypes({ eventId: screeningEvent.id });
-    console.log(ticketTypes.length, 'ticket types found');
+    const ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
+    console.log('チケットオファーは以下の通りです')
+    console.log(ticketOffers.map((o) => {
+        const videoFormatCharge = o.priceSpecification
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.VideoFormatChargeSpecification)
+            .map((s) => `+${s.appliesToVideoFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
+        return `${o.id} ${o.name.ja} ${o.price} ${o.priceCurrency} ${videoFormatCharge}`
+    }).join('\n'));
 
     // 空席検索
     const offers = await eventService.searchScreeningEventOffers({ eventId: screeningEvent.id });
@@ -187,8 +192,8 @@ async function main() {
     }
 
     // 券種をランダムに選択
-    const selectedTicketType = ticketTypes[Math.floor(ticketTypes.length * Math.random())];
-    console.log('ticket type selected', selectedTicketType.id);
+    const selectedTicketOffer = ticketOffers[Math.floor(ticketOffers.length * Math.random())];
+    console.log('ticket type selected', selectedTicketOffer.id);
     // 座席をランダムに選択
     const selectedScreeningRoomSection = offers[0].branchCode;
     console.log('screening room section selected', selectedScreeningRoomSection);
@@ -203,11 +208,9 @@ async function main() {
         event: {
             id: screeningEvent.id
         },
-        tickets: [
+        acceptedOffer: [
             {
-                ticketType: {
-                    id: selectedTicketType.id
-                },
+                id: selectedTicketOffer.id,
                 ticketedSeat: {
                     seatNumber: selectedSeatOffer.branchCode,
                     seatSection: selectedScreeningRoomSection
@@ -223,12 +226,18 @@ async function main() {
     // await placeOrderService.voidSeatReservation({ transactionId: transaction.id, actionId: seatReservationAuth.id });
     // console.log('seat reservation auth voided');
 
+    // 金額計算
+    if (seatReservationAuth.result === undefined) {
+        throw new Error('座席予約承認結果は必ず存在します');
+    }
+    let amount = seatReservationAuth.result.price;
+    console.log('金額は', amount);
+
     // クレジットカードオーソリアクション
     console.log('authorizing credit card payment...');
     let creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
         transactionId: transaction.id,
-        amount: seatReservationAuth.result.price,
-        // amount: ticketType.charge,
+        amount: amount,
         orderId: moment().unix(),
         method: '1',
         creditCard: {
@@ -253,8 +262,7 @@ async function main() {
     console.log('authorizing credit card payment...');
     creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
         transactionId: transaction.id,
-        amount: seatReservationAuth.result.price,
-        // amount: ticketType.charge,
+        amount: amount,
         orderId: moment().unix(),
         method: '1',
         creditCard: {

@@ -101,8 +101,14 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     // 券種検索
-    const ticketTypes = await eventService.searchScreeningEventTicketTypes({ eventId: screeningEvent.id });
-    console.log(ticketTypes.length, 'ticket types found');
+    const ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
+    console.log('チケットオファーは以下の通りです')
+    console.log(ticketOffers.map((o) => {
+        const videoFormatCharge = o.priceSpecification
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.VideoFormatChargeSpecification)
+            .map((s) => `+${s.appliesToVideoFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
+        return `${o.id} ${o.name.ja} ${o.price} ${o.priceCurrency} ${videoFormatCharge}`
+    }).join('\n'));
 
     // 空席検索
     const offers = await eventService.searchScreeningEventOffers({ eventId: screeningEvent.id });
@@ -116,8 +122,8 @@ async function main() {
     }
 
     // 券種をランダムに選択
-    const selectedTicketType = ticketTypes[Math.floor(ticketTypes.length * Math.random())];
-    console.log('ticket type selected', selectedTicketType.id);
+    const selectedTicketOffer = ticketOffers[Math.floor(ticketOffers.length * Math.random())];
+    console.log('ticket type selected', selectedTicketOffer.id);
     // 座席をランダムに選択
     const selectedScreeningRoomSection = offers[0].branchCode;
     console.log('screening room section selected', selectedScreeningRoomSection);
@@ -132,11 +138,9 @@ async function main() {
         event: {
             id: screeningEvent.id
         },
-        tickets: [
+        acceptedOffer: [
             {
-                ticketType: {
-                    id: selectedTicketType.id
-                },
+                id: selectedTicketOffer.id,
                 ticketedSeat: {
                     seatNumber: selectedSeatOffer.branchCode,
                     seatSection: selectedScreeningRoomSection
@@ -154,11 +158,19 @@ async function main() {
     });
     // 口座所有権をトークン化
     const { token } = await ownershipInfoService.getToken({ code });
+
+    // 金額計算
+    if (seatReservationAuth.result === undefined) {
+        throw new Error('座席予約承認結果は必ず存在します');
+    }
+    let amount = seatReservationAuth.result.price;
+    console.log('金額は', amount);
+
     // 口座オーソリアクション
     console.log('authorizing account payment...', token);
     const paymentAuth = await placeOrderService.authorizeAccountPayment({
         transactionId: transaction.id,
-        amount: seatReservationAuth.result.price,
+        amount: amount,
         // fromAccount: {
         //     accountType: client.factory.accountType.Coin,
         //     accountNumber: accountOwnershipInfo.typeOfGood.accountNumber
@@ -195,9 +207,9 @@ async function main() {
     console.log('confirming transaction...');
     const result = await placeOrderService.confirm({
         transactionId: transaction.id,
-        sendEmailMessage: false
+        sendEmailMessage: true
     });
-    console.log('transaction confirmed');
+    console.log('transaction confirmed', result.order.orderNumber);
 }
 
 async function wait(waitInMilliseconds) {
