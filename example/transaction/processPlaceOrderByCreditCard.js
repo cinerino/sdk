@@ -174,10 +174,16 @@ async function main() {
     const ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
     console.log('チケットオファーは以下の通りです')
     console.log(ticketOffers.map((o) => {
-        const videoFormatCharge = o.priceSpecification
+        const unitPriceSpecification = o.priceSpecification.priceComponent
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.UnitPriceSpecification)
+            .shift();
+        const videoFormatCharge = o.priceSpecification.priceComponent
             .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.VideoFormatChargeSpecification)
             .map((s) => `+${s.appliesToVideoFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
-        return `${o.id} ${o.name.ja} ${o.price} ${o.priceCurrency} ${videoFormatCharge}`
+        const soundFormatCharge = o.priceSpecification.priceComponent
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.SoundFormatChargeSpecification)
+            .map((s) => `+${s.appliesToSoundFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
+        return `${o.id} ${o.name.ja} ${unitPriceSpecification.price} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge}`
     }).join('\n'));
 
     // 空席検索
