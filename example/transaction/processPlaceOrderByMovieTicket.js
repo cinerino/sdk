@@ -1,5 +1,5 @@
 /**
- * クレジットカード決済による注文プロセス
+ * ムビチケ決済による注文プロセス
  */
 const moment = require('moment');
 const auth = require('../auth');
@@ -36,55 +36,6 @@ async function main() {
     const profile = await personService.getProfile({ personId: 'me' });
     console.log('profile found');
 
-    // 取引に使用するクレジットカードを決定する
-    let creditCard;
-    console.log('searching credit cards...');
-    let creditCards = await personOwnershipInfoService.searchCreditCards({
-        personId: 'me'
-    });
-    creditCards = creditCards.filter((c) => c.deleteFlag === '0');
-    if (creditCards.length === 0) {
-        console.log('adding credit card...');
-        creditCard = await personService.addCreditCard({
-            personId: 'me',
-            creditCard: {
-                cardNo: '4111111111111111',
-                expire: '2020',
-                holderName: 'AA BB'
-            }
-        });
-        console.log('credit card added', creditCard.cardSeq);
-    } else {
-        creditCard = creditCards[0];
-    }
-    console.log('using credit card...', creditCard.cardSeq);
-
-    // インセンティブ付与に使用するポイント口座を決定する
-    let pointAccount;
-    console.log('searching pointAccounts...');
-    const searchAccountsResult = await personOwnershipInfoService.search({
-        personId: 'me',
-        typeOfGood: {
-            typeOf: client.factory.ownershipInfo.AccountGoodType.Account,
-            accountType: client.factory.accountType.Point
-        }
-    });
-    const pointAccounts = searchAccountsResult.data
-        .map((o) => o.typeOfGood)
-        .filter((a) => a.status === client.factory.pecorino.accountStatusType.Opened);
-    if (pointAccounts.length === 0) {
-        console.log('opening pointAccount...');
-        pointAccount = await personOwnershipInfoService.openAccount({
-            personId: 'me',
-            name: loginTicket.getUsername(),
-            accountType: client.factory.accountType.Point
-        }).then((ownershipInfo) => ownershipInfo.typeOfGood);
-        console.log('pointAccount opened', pointAccount.accountNumber);
-    } else {
-        pointAccount = pointAccounts[0];
-    }
-    console.log('your point balance is', pointAccount.balance);
-
     // 販売劇場検索
     const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
     const seller = searchMovieTheatersResult.data[Math.floor(searchMovieTheatersResult.data.length * Math.random())];
@@ -92,30 +43,6 @@ async function main() {
         throw new Error('No seller');
     }
     console.log('ordering from seller...', seller.name.ja);
-
-    /*****************************************************************
-     * 会員としてポイントサービス特典を受けるためには、さらに会員プログラムへの登録処理が必要
-     *****************************************************************/
-    // console.log('所属会員プログラムを検索します...');
-    // const programMembershipOwnershipInfos = await personService.searchOwnershipInfos({
-    //     ownedBy: 'me',
-    //     goodType: 'ProgramMembership'
-    // });
-    // console.log(programMembershipOwnershipInfos.length, '件の会員プログラムに所属しています。')
-    // if (programMembershipOwnershipInfos.length === 0) {
-    //     const programMemberships = await programMembershipService.search({});
-    //     console.log(programMemberships.length, '件の会員プログラムが見つかりました。');
-
-    //     console.log('会員プログラムに登録します...');
-    //     const registerProgramMembershipTask = await personService.registerProgramMembership({
-    //         personId: 'me',
-    //         programMembershipId: programMemberships[0].id,
-    //         offerIdentifier: programMemberships[0].offers[0].identifier,
-    //         sellerType: seller.typeOf,
-    //         sellerId: seller.id
-    //     });
-    //     console.log('会員プログラム登録タスクが作成されました。', registerProgramMembershipTask.id);
-    // }
 
     // イベント検索
     const searchScreeningEventsResult = await eventService.searchScreeningEvents({
@@ -183,7 +110,11 @@ async function main() {
         const soundFormatCharge = o.priceSpecification.priceComponent
             .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.SoundFormatChargeSpecification)
             .map((s) => `+${s.appliesToSoundFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
-        return `${o.id} ${o.name.ja} ${unitPriceSpecification.price} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge}`
+        const movieTicketTypeCharge = o.priceSpecification.priceComponent
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification)
+            .map((s) => `+${s.appliesToVideoFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
+
+        return `${o.id} ${o.name.ja} ${unitPriceSpecification.price} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge} ${movieTicketTypeCharge}`
     }).join('\n'));
 
     // 空席検索
@@ -197,8 +128,16 @@ async function main() {
         throw new Error('No available seats');
     }
 
-    // 券種をランダムに選択
-    const selectedTicketOffer = ticketOffers[Math.floor(ticketOffers.length * Math.random())];
+    // ムビチケオファーを選択
+    const selectedTicketOffer = ticketOffers.find((offer) => {
+        const movieTicketTypeChargeSpecification = offer.priceSpecification.priceComponent.find(
+            (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
+        );
+        return movieTicketTypeChargeSpecification !== undefined;
+    });
+    if (selectedTicketOffer === undefined) {
+        throw new Error('ムビチケオファーが見つかりません');
+    }
     console.log('ticket type selected', selectedTicketOffer.id);
     // 座席をランダムに選択
     const selectedScreeningRoomSection = offers[0].branchCode;
@@ -240,47 +179,27 @@ async function main() {
     console.log('金額は', amount);
 
     // クレジットカードオーソリアクション
-    console.log('authorizing credit card payment...');
-    let creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
+    console.log('authorizing mvtk payment...');
+    let movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
         transactionId: transaction.id,
-        typeOf: client.factory.action.authorize.paymentMethod.creditCard.ObjectType.CreditCard,
-        amount: amount,
-        orderId: moment().unix(),
-        method: '1',
-        payType: '0',
-        creditCard: {
-            memberId: 'me',
-            cardSeq: creditCard.cardSeq
-            // cardPass: ''
-        }
-        // creditCard: {
-        //     cardNo: '4111111111111111',
-        //     expire: '2412',
-        //     holderName: 'AA BB'
-        // }
+        typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
+        knyknrNoInfoIn: []
     });
-    console.log('credit card payment authorized', creditCardPaymentAuth.id);
+    console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
 
     await wait(5000);
 
-    console.log('voiding credit card auth...');
-    await placeOrderService.voidCreditCardPayment({ transactionId: transaction.id, actionId: creditCardPaymentAuth.id });
-    console.log('credit card auth voided');
+    console.log('voiding mvtk auth...');
+    await placeOrderService.voidMovieTicketPayment({ transactionId: transaction.id, actionId: movieTicketPaymentAuth.id });
+    console.log('mvtk auth voided');
 
-    console.log('authorizing credit card payment...');
-    creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
+    console.log('authorizing mvtk payment...');
+    movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
         transactionId: transaction.id,
-        typeOf: client.factory.action.authorize.paymentMethod.creditCard.ObjectType.CreditCard,
-        amount: amount,
-        orderId: moment().unix(),
-        method: '1',
-        payType: '0',
-        creditCard: {
-            memberId: 'me',
-            cardSeq: creditCard.cardSeq
-        }
+        typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
+        knyknrNoInfoIn: []
     });
-    console.log('credit card payment authorized', creditCardPaymentAuth.id);
+    console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
 
     // 購入者情報入力時間
     // tslint:disable-next-line:no-magic-numbers
@@ -297,15 +216,6 @@ async function main() {
         }
     });
     console.log('customer contact set');
-
-    console.log('authorizing point award...');
-    const pointAwardAuth = await placeOrderService.authorizePointAward({
-        transactionId: transaction.id,
-        amount: 1,
-        toAccountNumber: pointAccount.accountNumber,
-        notes: 'Order Incentive'
-    });
-    console.log('point award authorized', pointAwardAuth.id);
 
     // 購入情報確認時間
     // tslint:disable-next-line:no-magic-numbers
