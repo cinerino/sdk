@@ -31,6 +31,10 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
+    const paymentService = new client.service.Payment({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient
+    });
 
     console.log('finding profile...');
     const profile = await personService.getProfile({ personId: 'me' });
@@ -125,7 +129,7 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     // 券種検索
-    const ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
+    let ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
     console.log('チケットオファーは以下の通りです')
     console.log(ticketOffers.map((o) => {
         const unitPriceSpecification = o.priceSpecification.priceComponent
@@ -156,12 +160,13 @@ async function main() {
     }
 
     // ムビチケオファーを選択
-    const selectedTicketOffer = ticketOffers.find((offer) => {
+    ticketOffers = ticketOffers.filter((offer) => {
         const movieTicketTypeChargeSpecification = offer.priceSpecification.priceComponent.find(
             (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
         );
         return movieTicketTypeChargeSpecification !== undefined;
     });
+    const selectedTicketOffer = ticketOffers.shift();
     if (selectedTicketOffer === undefined) {
         throw new Error('ムビチケオファーが見つかりません');
     }
@@ -205,15 +210,46 @@ async function main() {
     let amount = seatReservationAuth.result.price;
     console.log('金額は', amount);
 
-    // クレジットカードオーソリアクション
+    // ムビチケ認証
+    const movieTicket = {
+        knyknrNo: '0079929012', //購入管理番号
+        pinCd: '3896' // PINコード
+    };
+    const checkMovieTicketAction = await paymentService.checkMovieTicket({
+        typeOf: client.factory.paymentMethodType.MovieTicket,
+        event: { typeOf: client.factory.chevre.eventType.ScreeningEvent, id: screeningEvent.id },
+        seller: { typeOf: transaction.seller.typeOf, id: transaction.seller.id },
+        knyknrNoInfo: [movieTicket]
+    });
+    console.log('movie ticket:', checkMovieTicketAction);
+    const checkMovieTicketActionResult = checkMovieTicketAction.result;
+    if (checkMovieTicketActionResult === undefined) {
+        throw new Error('認証結果は必ず存在します');
+    }
+
+    const availableMovieTickets = checkMovieTicketActionResult.purchaseNumberAuthResult.knyknrNoInfoOut[0].ykknInfo;
+    if (availableMovieTickets === null) {
+        throw new Error('有効券が存在しません');
+    }
+    const movieTicketTypeChargeSpecification = selectedTicketOffer.priceSpecification.priceComponent.find(
+        (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
+    );
+    if (availableMovieTickets[0].ykknshTyp !== movieTicketTypeChargeSpecification.appliesToMovieTicketType) {
+        throw new Error(`ムビチケ券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} が必要です`);
+    }
+
+    // ムビチケ承認アクション
     console.log('authorizing mvtk payment...');
     let movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
         transactionId: transaction.id,
         typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
-        event: { id: screeningEvent.id },
-        knyknrNoInfoIn: [{
-            knyknrNo: '3472695908', //購入管理番号
-            pinCd: '7648' // PINコード
+        event: { typeOf: client.factory.chevre.eventType.ScreeningEvent, id: screeningEvent.id },
+        knyknrNoInfo: [{
+            ...movieTicket,
+            knshInfo: [{
+                knshTyp: '01',
+                miNum: 1
+            }]
         }]
     });
     console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
@@ -228,13 +264,19 @@ async function main() {
     movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
         transactionId: transaction.id,
         typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
-        event: { id: screeningEvent.id },
-        knyknrNoInfoIn: [{
-            knyknrNo: '3472695908', //購入管理番号
-            pinCd: '7648' // PINコード
+        event: { typeOf: client.factory.chevre.eventType.ScreeningEvent, id: screeningEvent.id },
+        knyknrNoInfo: [{
+            ...movieTicket,
+            knshInfo: [{
+                knshTyp: '01',
+                miNum: 1
+            }]
         }]
     });
     console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
+
+    // if (movieTicketTypeChargeSpecification.appliesToMovieTicketType !== ) {
+    // }
 
     // 購入者情報入力時間
     // tslint:disable-next-line:no-magic-numbers
