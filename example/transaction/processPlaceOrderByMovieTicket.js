@@ -72,7 +72,10 @@ async function main() {
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'week').toDate(),
-        superEvent: { locationBranchCodes: [seller.location.branchCode] }
+        superEvent: {
+            locationBranchCodes: [seller.location.branchCode],
+            workPerformedIdentifiers: ['1622100']
+        }
     });
     console.log(searchScreeningEventsResult.totalCount, 'events found');
 
@@ -84,6 +87,7 @@ async function main() {
         throw new Error('No available events');
     }
     const screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
+    // const screeningEvent = { id: '405gzn58jnbbx50a' };
 
     // WAITER許可証
     // const passportToken = await request.post(
@@ -206,7 +210,11 @@ async function main() {
     let movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
         transactionId: transaction.id,
         typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
-        knyknrNoInfoIn: []
+        event: { id: screeningEvent.id },
+        knyknrNoInfoIn: [{
+            knyknrNo: '3472695908', //購入管理番号
+            pinCd: '7648' // PINコード
+        }]
     });
     console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
 
@@ -220,7 +228,11 @@ async function main() {
     movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
         transactionId: transaction.id,
         typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
-        knyknrNoInfoIn: []
+        event: { id: screeningEvent.id },
+        knyknrNoInfoIn: [{
+            knyknrNo: '3472695908', //購入管理番号
+            pinCd: '7648' // PINコード
+        }]
     });
     console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
 
