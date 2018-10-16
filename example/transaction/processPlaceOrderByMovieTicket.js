@@ -36,6 +36,29 @@ async function main() {
     const profile = await personService.getProfile({ personId: 'me' });
     console.log('profile found');
 
+    // 取引に使用するクレジットカードを決定する
+    let creditCard;
+    console.log('searching credit cards...');
+    let creditCards = await personOwnershipInfoService.searchCreditCards({
+        personId: 'me'
+    });
+    creditCards = creditCards.filter((c) => c.deleteFlag === '0');
+    if (creditCards.length === 0) {
+        console.log('adding credit card...');
+        creditCard = await personService.addCreditCard({
+            personId: 'me',
+            creditCard: {
+                cardNo: '4111111111111111',
+                expire: '2020',
+                holderName: 'AA BB'
+            }
+        });
+        console.log('credit card added', creditCard.cardSeq);
+    } else {
+        creditCard = creditCards[0];
+    }
+    console.log('using credit card...', creditCard.cardSeq);
+
     // 販売劇場検索
     const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
     const seller = searchMovieTheatersResult.data[Math.floor(searchMovieTheatersResult.data.length * Math.random())];
@@ -204,6 +227,27 @@ async function main() {
     // 購入者情報入力時間
     // tslint:disable-next-line:no-magic-numbers
     await wait(5000);
+
+    // お直り金額があればクレジットカード決済
+    if (amount > 0) {
+        console.log('authorizing credit card payment...');
+        const creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
+            transactionId: transaction.id,
+            typeOf: client.factory.action.authorize.paymentMethod.creditCard.ObjectType.CreditCard,
+            amount: amount,
+            orderId: moment().unix(),
+            method: '1',
+            payType: '0',
+            creditCard: {
+                memberId: 'me',
+                cardSeq: creditCard.cardSeq
+                // cardPass: ''
+            }
+        });
+        console.log('credit card payment authorized', creditCardPaymentAuth.id);
+
+        await wait(5000);
+    }
 
     console.log('setting customer contact...');
     await placeOrderService.setCustomerContact({
