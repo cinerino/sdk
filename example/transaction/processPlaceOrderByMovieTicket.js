@@ -216,6 +216,8 @@ async function main() {
         typeOf: client.factory.paymentMethodType.MovieTicket,
         identifier: '0079929012',
         accessCode: '3896'
+        // identifier: '3472695908',
+        // accessCode: '7648'
     };
     const checkMovieTicketAction = await paymentService.checkMovieTicket({
         typeOf: client.factory.paymentMethodType.MovieTicket,
@@ -246,15 +248,16 @@ async function main() {
         throw new Error('認証結果は必ず存在します');
     }
 
-    const availableMovieTickets = checkMovieTicketActionResult.purchaseNumberAuthResult.knyknrNoInfoOut[0].ykknInfo;
-    if (availableMovieTickets === null) {
-        throw new Error('有効券が存在しません');
+    const availableMovieTickets = checkMovieTicketActionResult.movieTickets.filter((t) => t.validThrough === undefined);
+    if (availableMovieTickets.length === 0) {
+        throw new Error('有効なムビチケが存在しません');
     }
     const movieTicketTypeChargeSpecification = selectedTicketOffer.priceSpecification.priceComponent.find(
         (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
     );
-    if (availableMovieTickets[0].ykknshTyp !== movieTicketTypeChargeSpecification.appliesToMovieTicketType) {
-        throw new Error(`ムビチケ券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} が必要です`);
+    const selectedMovieTicket = availableMovieTickets.find((t) => t.serviceType === movieTicketTypeChargeSpecification.appliesToMovieTicketType);
+    if (selectedMovieTicket === undefined) {
+        throw new Error(`券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} のムビチケが見つかりません`);
     }
 
     // ムビチケ承認アクション
@@ -264,8 +267,7 @@ async function main() {
         typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
         movieTickets: pendingReservations.map((reservation) => {
             return {
-                ...movieTicket,
-                serviceType: availableMovieTickets[0].ykknshTyp,
+                ...selectedMovieTicket,
                 serviceOutput: {
                     reservationFor: {
                         typeOf: reservation.reservationFor.typeOf,
@@ -290,8 +292,7 @@ async function main() {
         typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
         movieTickets: pendingReservations.map((reservation) => {
             return {
-                ...movieTicket,
-                serviceType: availableMovieTickets[0].ykknshTyp,
+                ...selectedMovieTicket,
                 serviceOutput: {
                     reservationFor: {
                         typeOf: reservation.reservationFor.typeOf,
