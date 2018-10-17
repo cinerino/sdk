@@ -207,19 +207,38 @@ async function main() {
     if (seatReservationAuth.result === undefined) {
         throw new Error('座席予約承認結果は必ず存在します');
     }
+    const pendingReservations = seatReservationAuth.result.responseBody.object.reservations;
     let amount = seatReservationAuth.result.price;
     console.log('金額は', amount);
 
     // ムビチケ認証
     const movieTicket = {
-        knyknrNo: '0079929012', //購入管理番号
-        pinCd: '3896' // PINコード
+        typeOf: client.factory.paymentMethodType.MovieTicket,
+        identifier: '0079929012',
+        accessCode: '3896'
     };
     const checkMovieTicketAction = await paymentService.checkMovieTicket({
         typeOf: client.factory.paymentMethodType.MovieTicket,
-        event: { typeOf: client.factory.chevre.eventType.ScreeningEvent, id: screeningEvent.id },
+        movieTickets: [{
+            ...movieTicket,
+            serviceType: '', // 情報空でよし
+            serviceOutput: {
+                reservationFor: {
+                    typeOf: screeningEvent.typeOf,
+                    id: screeningEvent.id
+                },
+                reservedTicket: {
+                    ticketedSeat: {
+                        typeOf: client.factory.chevre.placeType.Seat,
+                        seatingType: '', // 情報空でよし
+                        seatNumber: '', // 情報空でよし
+                        seatRow: '', // 情報空でよし
+                        seatSection: '' // 情報空でよし
+                    }
+                }
+            }
+        }],
         seller: { typeOf: transaction.seller.typeOf, id: transaction.seller.id },
-        knyknrNoInfo: [movieTicket]
     });
     console.log('movie ticket:', checkMovieTicketAction);
     const checkMovieTicketActionResult = checkMovieTicketAction.result;
@@ -243,14 +262,19 @@ async function main() {
     let movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
         transactionId: transaction.id,
         typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
-        event: { typeOf: client.factory.chevre.eventType.ScreeningEvent, id: screeningEvent.id },
-        knyknrNoInfo: [{
-            ...movieTicket,
-            knshInfo: [{
-                knshTyp: '01',
-                miNum: 1
-            }]
-        }]
+        movieTickets: pendingReservations.map((reservation) => {
+            return {
+                ...movieTicket,
+                serviceType: availableMovieTickets[0].ykknshTyp,
+                serviceOutput: {
+                    reservationFor: {
+                        typeOf: reservation.reservationFor.typeOf,
+                        id: reservation.reservationFor.id
+                    },
+                    reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
+                }
+            };
+        })
     });
     console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
 
@@ -264,19 +288,21 @@ async function main() {
     movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
         transactionId: transaction.id,
         typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
-        event: { typeOf: client.factory.chevre.eventType.ScreeningEvent, id: screeningEvent.id },
-        knyknrNoInfo: [{
-            ...movieTicket,
-            knshInfo: [{
-                knshTyp: '01',
-                miNum: 1
-            }]
-        }]
+        movieTickets: pendingReservations.map((reservation) => {
+            return {
+                ...movieTicket,
+                serviceType: availableMovieTickets[0].ykknshTyp,
+                serviceOutput: {
+                    reservationFor: {
+                        typeOf: reservation.reservationFor.typeOf,
+                        id: reservation.reservationFor.id
+                    },
+                    reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
+                }
+            };
+        })
     });
     console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
-
-    // if (movieTicketTypeChargeSpecification.appliesToMovieTicketType !== ) {
-    // }
 
     // 購入者情報入力時間
     // tslint:disable-next-line:no-magic-numbers
@@ -326,20 +352,6 @@ async function main() {
 
     console.log('confirming transaction...');
     let result = await placeOrderService.confirm({
-        transactionId: transaction.id,
-        sendEmailMessage: true
-    });
-    console.log('transaction confirmed', result.order.orderNumber);
-    // 何度確定をコールしても冪等
-    console.log('confirming transaction...');
-    result = await placeOrderService.confirm({
-        transactionId: transaction.id,
-        sendEmailMessage: true
-    });
-    console.log('transaction confirmed', result.order.orderNumber);
-    // 何度確定をコールしても冪等
-    console.log('confirming transaction...');
-    result = await placeOrderService.confirm({
         transactionId: transaction.id,
         sendEmailMessage: true
     });
