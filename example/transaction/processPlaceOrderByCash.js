@@ -1,8 +1,8 @@
 /**
- * コイン口座決済による注文プロセス
+ * 汎用決済による注文プロセス
  */
 const moment = require('moment');
-const auth = require('../auth');
+const auth = require('../authAsAdmin');
 const client = require('../../lib/index');
 
 async function main() {
@@ -27,56 +27,25 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    const personOwnershipInfoService = new client.service.person.OwnershipInfo({
-        endpoint: process.env.API_ENDPOINT,
-        auth: authClient
-    });
-    const ownershipInfoService = new client.service.OwnershipInfo({
-        endpoint: process.env.API_ENDPOINT,
-        auth: authClient
-    });
 
     console.log('finding profile...');
     const profile = await personService.getProfile({ personId: 'me' });
     console.log('profile found');
 
-    // 決済に使用するコイン口座を決定する
-    let accountOwnershipInfo;
-    console.log('searching accounts...');
-    const searchAccountsResult = await personOwnershipInfoService.search({
-        personId: 'me',
-        typeOfGood: {
-            typeOf: client.factory.ownershipInfo.AccountGoodType.Account,
-            accountType: client.factory.accountType.Coin
-        }
-    });
-    const accountOwnershipInfos = searchAccountsResult.data
-        .filter((a) => a.typeOfGood.status === client.factory.pecorino.accountStatusType.Opened);
-    if (accountOwnershipInfos.length === 0) {
-        console.log('opening account...');
-        accountOwnershipInfo = await personOwnershipInfoService.openAccount({
-            personId: 'me',
-            name: loginTicket.getUsername(),
-            accountType: client.factory.accountType.Coin
-        });
-        console.log('account opened', accountOwnershipInfo.typeOfGood.accountNumber);
-    } else {
-        accountOwnershipInfo = accountOwnershipInfos[0];
-    }
-    console.log('your coin balance is', accountOwnershipInfo.typeOfGood.balance);
-
     // 販売劇場検索
     const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
-    const seller = searchMovieTheatersResult.data[0];
+    const seller = searchMovieTheatersResult.data[Math.floor(searchMovieTheatersResult.data.length * Math.random())];
     if (seller === undefined) {
         throw new Error('No seller');
     }
+    console.log('ordering from seller...', seller.name.ja);
 
     // イベント検索
     const searchScreeningEventsResult = await eventService.searchScreeningEvents({
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
-        inSessionThrough: moment().add(1, 'week').toDate()
+        inSessionThrough: moment().add(1, 'week').toDate(),
+        superEvent: { locationBranchCodes: [seller.location.branchCode] }
     });
     console.log(searchScreeningEventsResult.totalCount, 'events found');
 
@@ -89,14 +58,38 @@ async function main() {
     }
     const screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
 
+    // WAITER許可証
+    // const passportToken = await request.post(
+    //     `${process.env.WAITER_ENDPOINT}/passports`,
+    //     {
+    //         body: {
+    //             scope: `Transaction:PlaceOrder:${seller.id}`
+    //         },
+    //         json: true
+    //     }
+    // ).then((body) => body.token).catch((err) => {
+    //     throw new Error(err.message);
+    // });
+    // console.log('passportToken published', passportToken);
+
     console.log('starting transaction...');
     const transaction = await placeOrderService.start({
-        expires: moment().add(30, 'minutes').toDate(),
+        expires: moment().add(10, 'minutes').toDate(),
+        agent: {
+            identifier: [
+                {
+                    name: 'SampleName',
+                    value: 'SampleValue'
+                }
+            ]
+        },
         seller: {
             typeOf: seller.typeOf,
             id: seller.id
         },
-        object: {}
+        object: {
+            // passport: { token: passportToken }
+        }
     });
     console.log('transaction started', transaction.id);
 
@@ -104,10 +97,16 @@ async function main() {
     const ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
     console.log('チケットオファーは以下の通りです')
     console.log(ticketOffers.map((o) => {
+        const unitPriceSpecification = o.priceSpecification.priceComponent
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.UnitPriceSpecification)
+            .shift();
         const videoFormatCharge = o.priceSpecification.priceComponent
             .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.VideoFormatChargeSpecification)
             .map((s) => `+${s.appliesToVideoFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
-        return `${o.id} ${o.name.ja} ${o.price} ${o.priceCurrency} ${videoFormatCharge}`
+        const soundFormatCharge = o.priceSpecification.priceComponent
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.SoundFormatChargeSpecification)
+            .map((s) => `+${s.appliesToSoundFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
+        return `${o.id} ${o.name.ja} ${unitPriceSpecification.price} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge}`
     }).join('\n'));
 
     // 空席検索
@@ -133,7 +132,7 @@ async function main() {
 
     await wait(5000);
     console.log('authorizing seat reservation...');
-    const seatReservationAuth = await placeOrderService.authorizeSeatReservation({
+    let seatReservationAuth = await placeOrderService.authorizeSeatReservation({
         transactionId: transaction.id,
         event: {
             id: screeningEvent.id
@@ -151,13 +150,10 @@ async function main() {
     });
     console.log('seat reservation authorized', seatReservationAuth.id);
 
-    // 口座にコード発行
-    const { code } = await personOwnershipInfoService.authorize({
-        personId: 'me',
-        ownershipInfoId: accountOwnershipInfo.id
-    });
-    // 口座所有権をトークン化
-    const { token } = await ownershipInfoService.getToken({ code });
+    // await wait(5000);
+    // console.log('voiding seat reservation auth...');
+    // await placeOrderService.voidSeatReservation({ transactionId: transaction.id, actionId: seatReservationAuth.id });
+    // console.log('seat reservation auth voided');
 
     // 金額計算
     if (seatReservationAuth.result === undefined) {
@@ -166,18 +162,29 @@ async function main() {
     let amount = seatReservationAuth.result.price;
     console.log('金額は', amount);
 
-    // 口座オーソリアクション
-    console.log('authorizing account payment...', token);
-    const paymentAuth = await placeOrderService.authorizeAccountPayment({
+    console.log('authorizing any payment...');
+    let anyPaymentAuth = await placeOrderService.authorizeAnyPayment({
         transactionId: transaction.id,
+        typeOf: client.factory.paymentMethodType.Cash,
         amount: amount,
-        // fromAccount: {
-        //     accountType: client.factory.accountType.Coin,
-        //     accountNumber: accountOwnershipInfo.typeOfGood.accountNumber
-        // }
-        fromAccount: token
+        additionalProperty: [{ name: 'useCoin', value: false }]
     });
-    console.log('account payment authorized', paymentAuth.id);
+    console.log('any payment authorized', anyPaymentAuth.id);
+
+    await wait(5000);
+
+    console.log('voiding any auth...');
+    await placeOrderService.voidAnyPayment({ transactionId: transaction.id, actionId: anyPaymentAuth.id });
+    console.log('any auth voided');
+
+    console.log('authorizing any payment...');
+    anyPaymentAuth = await placeOrderService.authorizeAnyPayment({
+        transactionId: transaction.id,
+        typeOf: client.factory.paymentMethodType.Cash,
+        amount: amount,
+        additionalProperty: [{ name: 'useCoin', value: false }]
+    });
+    console.log('any authorized', anyPaymentAuth.id);
 
     // 購入者情報入力時間
     // tslint:disable-next-line:no-magic-numbers
@@ -189,7 +196,7 @@ async function main() {
         contact: {
             givenName: 'Taro',
             familyName: 'Motion',
-            telephone: '+819012345678s',
+            telephone: '+819012345678',
             email: profile.email
         }
     });
@@ -205,7 +212,7 @@ async function main() {
     // console.log('取引を中止しました。');
 
     console.log('confirming transaction...');
-    const result = await placeOrderService.confirm({
+    let result = await placeOrderService.confirm({
         transactionId: transaction.id,
         sendEmailMessage: true
     });
@@ -219,3 +226,5 @@ async function wait(waitInMilliseconds) {
 main().then(() => {
     console.log('success!');
 }).catch(console.error);
+
+exports.main = main;
