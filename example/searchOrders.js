@@ -21,11 +21,16 @@ async function main() {
         page: 1,
         orderDateFrom: moment().add(-1, 'month').toDate(),
         orderDateThrough: moment().toDate(),
-        customer: {
-            typeOf: client.factory.personType.Person,
-            identifiers: [
-                { name: 'SampleName', value: 'SampleValue' }
-            ]
+        // customer: {
+        //     typeOf: client.factory.personType.Person,
+        //     identifiers: [
+        //         { name: 'SampleName', value: 'SampleValue' }
+        //     ]
+        // },
+        paymentMethods: {
+
+            typeOfs: [client.factory.paymentMethodType.Account],
+            // paymentMethodIds: ['30118000911']
         }
     });
     console.log(totalCount, 'orders found');
