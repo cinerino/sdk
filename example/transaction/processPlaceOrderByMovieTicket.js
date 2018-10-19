@@ -220,12 +220,22 @@ async function main() {
     const movieTickets = [
         {
             typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '0079929012',
+            identifier: '1990419719',
             accessCode: '3896'
         },
         {
             typeOf: client.factory.paymentMethodType.MovieTicket,
             identifier: '9921920239',
+            accessCode: '3896'
+        },
+        {
+            typeOf: client.factory.paymentMethodType.MovieTicket,
+            identifier: '2971920249',
+            accessCode: '3896'
+        },
+        {
+            typeOf: client.factory.paymentMethodType.MovieTicket,
+            identifier: '1029949018',
             accessCode: '3896'
         }
     ];
@@ -269,7 +279,10 @@ async function main() {
     );
     const selectedMovieTickets = availableMovieTickets.filter((t) => t.serviceType === movieTicketTypeChargeSpecification.appliesToMovieTicketType);
     if (selectedMovieTickets.length === 0) {
-        throw new Error(`券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} のムビチケが見つかりません`);
+        throw new Error(`券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} の有効なムビチケが見つかりません`);
+    }
+    if (selectedMovieTickets.length < pendingReservations.length) {
+        throw new Error('有効なムビチケが足りません');
     }
 
     // ムビチケ承認アクション
@@ -278,9 +291,9 @@ async function main() {
         typeOf: client.factory.paymentMethodType.MovieTicket,
         transactionId: transaction.id,
         amount: 0,
-        movieTickets: pendingReservations.map((reservation) => {
+        movieTickets: pendingReservations.map((reservation, index) => {
             return {
-                ...selectedMovieTickets[0],
+                ...selectedMovieTickets[index],
                 serviceOutput: {
                     reservationFor: {
                         typeOf: reservation.reservationFor.typeOf,
@@ -304,9 +317,9 @@ async function main() {
         typeOf: client.factory.paymentMethodType.MovieTicket,
         transactionId: transaction.id,
         amount: 0,
-        movieTickets: pendingReservations.map((reservation) => {
+        movieTickets: pendingReservations.map((reservation, index) => {
             return {
-                ...selectedMovieTickets[0],
+                ...selectedMovieTickets[index],
                 serviceOutput: {
                     reservationFor: {
                         typeOf: reservation.reservationFor.typeOf,
