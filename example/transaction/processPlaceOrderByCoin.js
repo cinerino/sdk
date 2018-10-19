@@ -101,13 +101,19 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     // 券種検索
-    const ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
+    let ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
     console.log('チケットオファーは以下の通りです')
     console.log(ticketOffers.map((o) => {
+        const unitPriceSpecification = o.priceSpecification.priceComponent
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.UnitPriceSpecification)
+            .shift();
         const videoFormatCharge = o.priceSpecification.priceComponent
             .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.VideoFormatChargeSpecification)
             .map((s) => `+${s.appliesToVideoFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
-        return `${o.id} ${o.name.ja} ${o.price} ${o.priceCurrency} ${videoFormatCharge}`
+        const soundFormatCharge = o.priceSpecification.priceComponent
+            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.SoundFormatChargeSpecification)
+            .map((s) => `+${s.appliesToSoundFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
+        return `${o.id} ${o.name.ja} ${unitPriceSpecification.price} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge}`
     }).join('\n'));
 
     // 空席検索
@@ -121,8 +127,16 @@ async function main() {
         throw new Error('No available seats');
     }
 
-    // 券種をランダムに選択
-    const selectedTicketOffer = ticketOffers[Math.floor(ticketOffers.length * Math.random())];
+    // ムビチケ以外のオファーを選択
+    ticketOffers = ticketOffers.filter((offer) => {
+        const movieTicketTypeChargeSpecification = offer.priceSpecification.priceComponent.find(
+            (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
+        );
+        return movieTicketTypeChargeSpecification === undefined;
+    });
+    const selectedTicketOffer = ticketOffers.shift();
+    console.log('ticket offer selected', selectedTicketOffer.id);
+
     console.log('ticket type selected', selectedTicketOffer.id);
     // 座席をランダムに選択
     const selectedScreeningRoomSection = offers[0].branchCode;
@@ -169,6 +183,7 @@ async function main() {
     // 口座オーソリアクション
     console.log('authorizing account payment...', token);
     const paymentAuth = await placeOrderService.authorizeAccountPayment({
+        typeOf: client.factory.paymentMethodType.Account,
         transactionId: transaction.id,
         amount: amount,
         // fromAccount: {

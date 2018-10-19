@@ -175,8 +175,8 @@ async function main() {
     const selectedScreeningRoomSection = offers[0].branchCode;
     console.log('screening room section selected', selectedScreeningRoomSection);
     console.log(selectedScreeningRoomSection);
-    const selectedSeatOffer = availableSeatOffers[Math.floor(availableSeatOffers.length * Math.random())];
-    console.log('seat selected', selectedSeatOffer.branchCode);
+    const selectedSeatOffers = availableSeatOffers.slice(0, 2);
+    console.log('seat selected', selectedSeatOffers.map((o) => o.branchCode).join(','));
 
     await wait(5000);
     console.log('authorizing seat reservation...');
@@ -185,15 +185,15 @@ async function main() {
         event: {
             id: screeningEvent.id
         },
-        acceptedOffer: [
-            {
+        acceptedOffer: selectedSeatOffers.map((selectedSeatOffer) => {
+            return {
                 id: selectedTicketOffer.id,
                 ticketedSeat: {
                     seatNumber: selectedSeatOffer.branchCode,
                     seatSection: selectedScreeningRoomSection
                 }
-            }
-        ],
+            };
+        }),
         notes: 'test from samples'
     });
     console.log('seat reservation authorized', seatReservationAuth.id);
@@ -212,34 +212,46 @@ async function main() {
     console.log('金額は', amount);
 
     // ムビチケ認証
-    const movieTicket = {
-        typeOf: client.factory.paymentMethodType.MovieTicket,
-        identifier: '0079929012',
-        accessCode: '3896'
-        // identifier: '3472695908',
-        // accessCode: '7648'
-    };
+    // const movieTicket = {
+    //     typeOf: client.factory.paymentMethodType.MovieTicket,
+    //     identifier: '3472695908',
+    //     accessCode: '7648'
+    // };
+    const movieTickets = [
+        {
+            typeOf: client.factory.paymentMethodType.MovieTicket,
+            identifier: '0079929012',
+            accessCode: '3896'
+        },
+        {
+            typeOf: client.factory.paymentMethodType.MovieTicket,
+            identifier: '9921920239',
+            accessCode: '3896'
+        }
+    ];
     const checkMovieTicketAction = await paymentService.checkMovieTicket({
         typeOf: client.factory.paymentMethodType.MovieTicket,
-        movieTickets: [{
-            ...movieTicket,
-            serviceType: '', // 情報空でよし
-            serviceOutput: {
-                reservationFor: {
-                    typeOf: screeningEvent.typeOf,
-                    id: screeningEvent.id
-                },
-                reservedTicket: {
-                    ticketedSeat: {
-                        typeOf: client.factory.chevre.placeType.Seat,
-                        seatingType: '', // 情報空でよし
-                        seatNumber: '', // 情報空でよし
-                        seatRow: '', // 情報空でよし
-                        seatSection: '' // 情報空でよし
+        movieTickets: movieTickets.map((movieTicket) => {
+            return {
+                ...movieTicket,
+                serviceType: '', // 情報空でよし
+                serviceOutput: {
+                    reservationFor: {
+                        typeOf: screeningEvent.typeOf,
+                        id: screeningEvent.id
+                    },
+                    reservedTicket: {
+                        ticketedSeat: {
+                            typeOf: client.factory.chevre.placeType.Seat,
+                            seatingType: '', // 情報空でよし
+                            seatNumber: '', // 情報空でよし
+                            seatRow: '', // 情報空でよし
+                            seatSection: '' // 情報空でよし
+                        }
                     }
                 }
-            }
-        }],
+            };
+        }),
         seller: { typeOf: transaction.seller.typeOf, id: transaction.seller.id },
     });
     console.log('movie ticket:', checkMovieTicketAction);
@@ -255,19 +267,20 @@ async function main() {
     const movieTicketTypeChargeSpecification = selectedTicketOffer.priceSpecification.priceComponent.find(
         (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
     );
-    const selectedMovieTicket = availableMovieTickets.find((t) => t.serviceType === movieTicketTypeChargeSpecification.appliesToMovieTicketType);
-    if (selectedMovieTicket === undefined) {
+    const selectedMovieTickets = availableMovieTickets.filter((t) => t.serviceType === movieTicketTypeChargeSpecification.appliesToMovieTicketType);
+    if (selectedMovieTickets.length === 0) {
         throw new Error(`券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} のムビチケが見つかりません`);
     }
 
     // ムビチケ承認アクション
     console.log('authorizing mvtk payment...');
     let movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
+        typeOf: client.factory.paymentMethodType.MovieTicket,
         transactionId: transaction.id,
-        typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
+        amount: 0,
         movieTickets: pendingReservations.map((reservation) => {
             return {
-                ...selectedMovieTicket,
+                ...selectedMovieTickets[0],
                 serviceOutput: {
                     reservationFor: {
                         typeOf: reservation.reservationFor.typeOf,
@@ -288,11 +301,12 @@ async function main() {
 
     console.log('authorizing mvtk payment...');
     movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
+        typeOf: client.factory.paymentMethodType.MovieTicket,
         transactionId: transaction.id,
-        typeOf: client.factory.action.authorize.paymentMethod.movieTicket.ObjectType.MovieTicket,
+        amount: 0,
         movieTickets: pendingReservations.map((reservation) => {
             return {
-                ...selectedMovieTicket,
+                ...selectedMovieTickets[0],
                 serviceOutput: {
                     reservationFor: {
                         typeOf: reservation.reservationFor.typeOf,
@@ -314,7 +328,7 @@ async function main() {
         console.log('authorizing credit card payment...');
         const creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
             transactionId: transaction.id,
-            typeOf: client.factory.action.authorize.paymentMethod.creditCard.ObjectType.CreditCard,
+            typeOf: client.factory.paymentMethodType.CreditCard,
             amount: amount,
             orderId: moment().unix(),
             method: '1',

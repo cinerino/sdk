@@ -171,7 +171,7 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     // 券種検索
-    const ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
+    let ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
     console.log('チケットオファーは以下の通りです')
     console.log(ticketOffers.map((o) => {
         const unitPriceSpecification = o.priceSpecification.priceComponent
@@ -197,9 +197,16 @@ async function main() {
         throw new Error('No available seats');
     }
 
-    // 券種をランダムに選択
-    const selectedTicketOffer = ticketOffers[Math.floor(ticketOffers.length * Math.random())];
-    console.log('ticket type selected', selectedTicketOffer.id);
+    // ムビチケ以外のオファーを選択
+    ticketOffers = ticketOffers.filter((offer) => {
+        const movieTicketTypeChargeSpecification = offer.priceSpecification.priceComponent.find(
+            (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
+        );
+        return movieTicketTypeChargeSpecification === undefined;
+    });
+    const selectedTicketOffer = ticketOffers.shift();
+    console.log('ticket offer selected', selectedTicketOffer.id);
+
     // 座席をランダムに選択
     const selectedScreeningRoomSection = offers[0].branchCode;
     console.log('screening room section selected', selectedScreeningRoomSection);
@@ -243,7 +250,7 @@ async function main() {
     console.log('authorizing credit card payment...');
     let creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
         transactionId: transaction.id,
-        typeOf: client.factory.action.authorize.paymentMethod.creditCard.ObjectType.CreditCard,
+        typeOf: client.factory.paymentMethodType.CreditCard,
         amount: amount,
         orderId: moment().unix(),
         method: '1',
@@ -270,7 +277,7 @@ async function main() {
     console.log('authorizing credit card payment...');
     creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
         transactionId: transaction.id,
-        typeOf: client.factory.action.authorize.paymentMethod.creditCard.ObjectType.CreditCard,
+        typeOf: client.factory.paymentMethodType.CreditCard,
         amount: amount,
         orderId: moment().unix(),
         method: '1',
