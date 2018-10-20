@@ -19,18 +19,43 @@ async function main() {
     const { totalCount, data } = await orderService.search({
         limit: 10,
         page: 1,
-        orderDateFrom: moment().add(-1, 'month').toDate(),
+        orderDateFrom: moment().add(-3, 'month').toDate(),
         orderDateThrough: moment().toDate(),
         // customer: {
         //     typeOf: client.factory.personType.Person,
         //     identifiers: [
         //         { name: 'SampleName', value: 'SampleValue' }
-        //     ]
+        //     ],
+        //     telephone: '3896$'
         // },
         paymentMethods: {
-
-            typeOfs: [client.factory.paymentMethodType.Account],
+            // typeOfs: [client.factory.paymentMethodType.Account],
             // paymentMethodIds: ['30118000911']
+        },
+        acceptedOffers: {
+            itemOffered: {
+                // ids: ['118-181018-000018-0'],
+                reservationFor: {
+                    // ids: ['xdflc2sjncbz279'],
+                    // name: '',
+                    // inSessionFrom: moment().add(1, 'days').toDate(),
+                    // inSessionThrough: moment().add(4, 'days').toDate(),
+                    // startFrom: moment().toDate(),
+                    // startThrough: moment().add(3, 'days').toDate(),
+                    location: {
+                        // branchCodes: ['90'],
+                    },
+                    superEvent: {
+                        // ids: ['405gzn58jnbd0wks'],
+                        location: {
+                            // branchCodes: ['002'],
+                        },
+                        workPerformed: {
+                            // identifiers: ['1622100'],
+                        }
+                    }
+                }
+            }
         }
     });
     console.log(totalCount, 'orders found');
