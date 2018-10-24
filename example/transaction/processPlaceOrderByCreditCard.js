@@ -171,7 +171,11 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     // 券種検索
-    let ticketOffers = await eventService.searchScreeningEventTicketOffers({ eventId: screeningEvent.id });
+    let ticketOffers = await eventService.searchScreeningEventTicketOffers({
+        event: { id: screeningEvent.id },
+        seller: { typeOf: seller.typeOf, id: seller.id },
+        store: { id: process.env.TEST_CLIENT_ID },
+    });
     console.log('チケットオファーは以下の通りです')
     console.log(ticketOffers.map((o) => {
         const unitPriceSpecification = o.priceSpecification.priceComponent
