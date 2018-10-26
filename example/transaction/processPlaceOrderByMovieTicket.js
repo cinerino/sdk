@@ -216,32 +216,12 @@ async function main() {
     console.log('金額は', amount);
 
     // ムビチケ認証
-    // const movieTicket = {
-    //     typeOf: client.factory.paymentMethodType.MovieTicket,
-    //     identifier: '3472695908',
-    //     accessCode: '7648'
-    // };
     const movieTickets = [
         {
             typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '1990419719',
+            identifier: '1931980249',
             accessCode: '3896'
         },
-        {
-            typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '9921920239',
-            accessCode: '3896'
-        },
-        {
-            typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '2971920249',
-            accessCode: '3896'
-        },
-        {
-            typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '1029949018',
-            accessCode: '3896'
-        }
     ];
     const checkMovieTicketAction = await paymentService.checkMovieTicket({
         typeOf: client.factory.paymentMethodType.MovieTicket,
@@ -347,7 +327,7 @@ async function main() {
             transactionId: transaction.id,
             typeOf: client.factory.paymentMethodType.CreditCard,
             amount: amount,
-            orderId: moment().unix(),
+            orderId: `SAMPLE-${moment().unix().toString()}`,
             method: '1',
             payType: '0',
             creditCard: {

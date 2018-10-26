@@ -256,7 +256,7 @@ async function main() {
         transactionId: transaction.id,
         typeOf: client.factory.paymentMethodType.CreditCard,
         amount: amount,
-        orderId: moment().unix(),
+        orderId: `SAMPLE-${moment().unix().toString()}`,
         method: '1',
         payType: '0',
         creditCard: {
@@ -283,7 +283,7 @@ async function main() {
         transactionId: transaction.id,
         typeOf: client.factory.paymentMethodType.CreditCard,
         amount: amount,
-        orderId: moment().unix(),
+        orderId: `SAMPLE-${moment().unix().toString()}`,
         method: '1',
         payType: '0',
         creditCard: {
