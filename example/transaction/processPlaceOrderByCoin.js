@@ -19,7 +19,7 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    const placeOrderService = new client.service.transaction.PlaceOrder({
+    const placeOrderService = new client.service.txn.PlaceOrder({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
@@ -152,20 +152,22 @@ async function main() {
     await wait(5000);
     console.log('authorizing seat reservation...');
     const seatReservationAuth = await placeOrderService.authorizeSeatReservation({
-        transactionId: transaction.id,
-        event: {
-            id: screeningEvent.id
-        },
-        acceptedOffer: [
-            {
-                id: selectedTicketOffer.id,
-                ticketedSeat: {
-                    seatNumber: selectedSeatOffer.branchCode,
-                    seatSection: selectedScreeningRoomSection
+        object: {
+            event: {
+                id: screeningEvent.id
+            },
+            acceptedOffer: [
+                {
+                    id: selectedTicketOffer.id,
+                    ticketedSeat: {
+                        seatNumber: selectedSeatOffer.branchCode,
+                        seatSection: selectedScreeningRoomSection
+                    }
                 }
-            }
-        ],
-        notes: 'test from samples'
+            ],
+            notes: 'test from samples'
+        },
+        purpose: transaction
     });
     console.log('seat reservation authorized', seatReservationAuth.id);
 
@@ -187,14 +189,16 @@ async function main() {
     // 口座オーソリアクション
     console.log('authorizing account payment...', token);
     const paymentAuth = await placeOrderService.authorizeAccountPayment({
-        typeOf: client.factory.paymentMethodType.Account,
-        transactionId: transaction.id,
-        amount: amount,
-        // fromAccount: {
-        //     accountType: client.factory.accountType.Coin,
-        //     accountNumber: accountOwnershipInfo.typeOfGood.accountNumber
-        // }
-        fromAccount: token
+        object: {
+            typeOf: client.factory.paymentMethodType.Account,
+            amount: amount,
+            // fromAccount: {
+            //     accountType: client.factory.accountType.Coin,
+            //     accountNumber: accountOwnershipInfo.typeOfGood.accountNumber
+            // }
+            fromAccount: token
+        },
+        purpose: transaction
     });
     console.log('account payment authorized', paymentAuth.id);
 
@@ -204,12 +208,14 @@ async function main() {
 
     console.log('setting customer contact...');
     await placeOrderService.setCustomerContact({
-        transactionId: transaction.id,
-        contact: {
-            givenName: 'Taro',
-            familyName: 'Motion',
-            telephone: '+819012345678s',
-            email: profile.email
+        id: transaction.id,
+        object: {
+            customerContact: {
+                givenName: 'Taro',
+                familyName: 'Motion',
+                telephone: '+819012345678s',
+                email: profile.email
+            }
         }
     });
     console.log('customer contact set');
@@ -225,8 +231,10 @@ async function main() {
 
     console.log('confirming transaction...');
     const result = await placeOrderService.confirm({
-        transactionId: transaction.id,
-        sendEmailMessage: true
+        id: transaction.id,
+        options: {
+            sendEmailMessage: true
+        }
     });
     console.log('transaction confirmed', result.order.orderNumber);
 }

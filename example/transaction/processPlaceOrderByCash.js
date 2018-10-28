@@ -19,7 +19,7 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    const placeOrderService = new client.service.transaction.PlaceOrder({
+    const placeOrderService = new client.service.txn.PlaceOrder({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
@@ -144,27 +144,24 @@ async function main() {
     await wait(5000);
     console.log('authorizing seat reservation...');
     let seatReservationAuth = await placeOrderService.authorizeSeatReservation({
-        transactionId: transaction.id,
-        event: {
-            id: screeningEvent.id
-        },
-        acceptedOffer: [
-            {
-                id: selectedTicketOffer.id,
-                ticketedSeat: {
-                    seatNumber: selectedSeatOffer.branchCode,
-                    seatSection: selectedScreeningRoomSection
+        object: {
+            event: {
+                id: screeningEvent.id
+            },
+            acceptedOffer: [
+                {
+                    id: selectedTicketOffer.id,
+                    ticketedSeat: {
+                        seatNumber: selectedSeatOffer.branchCode,
+                        seatSection: selectedScreeningRoomSection
+                    }
                 }
-            }
-        ],
-        notes: 'test from samples'
+            ],
+            notes: 'test from samples'
+        },
+        purpose: transaction
     });
     console.log('seat reservation authorized', seatReservationAuth.id);
-
-    // await wait(5000);
-    // console.log('voiding seat reservation auth...');
-    // await placeOrderService.voidSeatReservation({ transactionId: transaction.id, actionId: seatReservationAuth.id });
-    // console.log('seat reservation auth voided');
 
     // 金額計算
     if (seatReservationAuth.result === undefined) {
@@ -175,25 +172,29 @@ async function main() {
 
     console.log('authorizing any payment...');
     let anyPaymentAuth = await placeOrderService.authorizeAnyPayment({
-        transactionId: transaction.id,
-        typeOf: client.factory.paymentMethodType.Cash,
-        amount: amount,
-        additionalProperty: [{ name: 'useCoin', value: false }]
+        object: {
+            typeOf: client.factory.paymentMethodType.Cash,
+            amount: amount,
+            additionalProperty: [{ name: 'useCoin', value: false }]
+        },
+        purpose: transaction
     });
     console.log('any payment authorized', anyPaymentAuth.id);
 
     await wait(5000);
 
     console.log('voiding any auth...');
-    await placeOrderService.voidAnyPayment({ transactionId: transaction.id, actionId: anyPaymentAuth.id });
+    await placeOrderService.voidAnyPayment(anyPaymentAuth);
     console.log('any auth voided');
 
     console.log('authorizing any payment...');
     anyPaymentAuth = await placeOrderService.authorizeAnyPayment({
-        transactionId: transaction.id,
-        typeOf: client.factory.paymentMethodType.Cash,
-        amount: amount,
-        additionalProperty: [{ name: 'useCoin', value: false }]
+        object: {
+            typeOf: client.factory.paymentMethodType.Cash,
+            amount: amount,
+            additionalProperty: [{ name: 'useCoin', value: false }]
+        },
+        purpose: transaction
     });
     console.log('any authorized', anyPaymentAuth.id);
 
@@ -203,12 +204,14 @@ async function main() {
 
     console.log('setting customer contact...');
     await placeOrderService.setCustomerContact({
-        transactionId: transaction.id,
-        contact: {
-            givenName: 'Taro',
-            familyName: 'Motion',
-            telephone: '+819012345678',
-            email: profile.email
+        id: transaction.id,
+        object: {
+            customerContact: {
+                givenName: 'Taro',
+                familyName: 'Motion',
+                telephone: '+819012345678',
+                email: profile.email
+            }
         }
     });
     console.log('customer contact set');
@@ -224,8 +227,10 @@ async function main() {
 
     console.log('confirming transaction...');
     let result = await placeOrderService.confirm({
-        transactionId: transaction.id,
-        sendEmailMessage: true
+        id: transaction.id,
+        options: {
+            sendEmailMessage: true
+        }
     });
     console.log('transaction confirmed', result.order.orderNumber);
 }

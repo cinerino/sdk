@@ -11,7 +11,7 @@ async function main() {
     const loginTicket = authClient.verifyIdToken({});
     console.log('username is', loginTicket.getUsername());
 
-    const returnOrderService = new client.service.transaction.ReturnOrder({
+    const returnOrderService = new client.service.txn.ReturnOrder({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });

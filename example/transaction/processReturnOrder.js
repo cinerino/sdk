@@ -11,7 +11,7 @@ async function main() {
     const loginTicket = authClient.verifyIdToken({});
     console.log('username is', loginTicket.getUsername());
 
-    const returnOrderService = new client.service.transaction.ReturnOrder({
+    const returnOrderService = new client.service.txn.ReturnOrder({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
@@ -25,9 +25,7 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     console.log('confirming transaction...');
-    await returnOrderService.confirm({
-        transactionId: transaction.id
-    });
+    await returnOrderService.confirm(transaction);
     console.log('transaction confirmed');
 }
 

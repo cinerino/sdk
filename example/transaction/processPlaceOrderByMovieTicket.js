@@ -19,7 +19,7 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    const placeOrderService = new client.service.transaction.PlaceOrder({
+    const placeOrderService = new client.service.txn.PlaceOrder({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
@@ -185,27 +185,24 @@ async function main() {
     await wait(5000);
     console.log('authorizing seat reservation...');
     let seatReservationAuth = await placeOrderService.authorizeSeatReservation({
-        transactionId: transaction.id,
-        event: {
-            id: screeningEvent.id
+        object: {
+            event: {
+                id: screeningEvent.id
+            },
+            acceptedOffer: selectedSeatOffers.map((selectedSeatOffer) => {
+                return {
+                    id: selectedTicketOffer.id,
+                    ticketedSeat: {
+                        seatNumber: selectedSeatOffer.branchCode,
+                        seatSection: selectedScreeningRoomSection
+                    }
+                };
+            }),
+            notes: 'test from samples'
         },
-        acceptedOffer: selectedSeatOffers.map((selectedSeatOffer) => {
-            return {
-                id: selectedTicketOffer.id,
-                ticketedSeat: {
-                    seatNumber: selectedSeatOffer.branchCode,
-                    seatSection: selectedScreeningRoomSection
-                }
-            };
-        }),
-        notes: 'test from samples'
+        purpose: transaction
     });
     console.log('seat reservation authorized', seatReservationAuth.id);
-
-    // await wait(5000);
-    // console.log('voiding seat reservation auth...');
-    // await placeOrderService.voidSeatReservation({ transactionId: transaction.id, actionId: seatReservationAuth.id });
-    // console.log('seat reservation auth voided');
 
     // 金額計算
     if (seatReservationAuth.result === undefined) {
@@ -219,7 +216,7 @@ async function main() {
     const movieTickets = [
         {
             typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '1931980249',
+            identifier: '3419970198',
             accessCode: '3896'
         },
     ];
@@ -272,47 +269,51 @@ async function main() {
     // ムビチケ承認アクション
     console.log('authorizing mvtk payment...');
     let movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
-        typeOf: client.factory.paymentMethodType.MovieTicket,
-        transactionId: transaction.id,
-        amount: 0,
-        movieTickets: pendingReservations.map((reservation, index) => {
-            return {
-                ...selectedMovieTickets[index],
-                serviceOutput: {
-                    reservationFor: {
-                        typeOf: reservation.reservationFor.typeOf,
-                        id: reservation.reservationFor.id
-                    },
-                    reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
-                }
-            };
-        })
+        object: {
+            typeOf: client.factory.paymentMethodType.MovieTicket,
+            amount: 0,
+            movieTickets: pendingReservations.map((reservation, index) => {
+                return {
+                    ...selectedMovieTickets[index],
+                    serviceOutput: {
+                        reservationFor: {
+                            typeOf: reservation.reservationFor.typeOf,
+                            id: reservation.reservationFor.id
+                        },
+                        reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
+                    }
+                };
+            })
+        },
+        purpose: transaction
     });
     console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
 
     await wait(5000);
 
     console.log('voiding mvtk auth...');
-    await placeOrderService.voidMovieTicketPayment({ transactionId: transaction.id, actionId: movieTicketPaymentAuth.id });
+    await placeOrderService.voidPayment(movieTicketPaymentAuth);
     console.log('mvtk auth voided');
 
     console.log('authorizing mvtk payment...');
     movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
-        typeOf: client.factory.paymentMethodType.MovieTicket,
-        transactionId: transaction.id,
-        amount: 0,
-        movieTickets: pendingReservations.map((reservation, index) => {
-            return {
-                ...selectedMovieTickets[index],
-                serviceOutput: {
-                    reservationFor: {
-                        typeOf: reservation.reservationFor.typeOf,
-                        id: reservation.reservationFor.id
-                    },
-                    reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
-                }
-            };
-        })
+        object: {
+            typeOf: client.factory.paymentMethodType.MovieTicket,
+            amount: 0,
+            movieTickets: pendingReservations.map((reservation, index) => {
+                return {
+                    ...selectedMovieTickets[index],
+                    serviceOutput: {
+                        reservationFor: {
+                            typeOf: reservation.reservationFor.typeOf,
+                            id: reservation.reservationFor.id
+                        },
+                        reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
+                    }
+                };
+            })
+        },
+        purpose: transaction
     });
     console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
 
@@ -324,17 +325,18 @@ async function main() {
     if (amount > 0) {
         console.log('authorizing credit card payment...');
         const creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
-            transactionId: transaction.id,
-            typeOf: client.factory.paymentMethodType.CreditCard,
-            amount: amount,
-            orderId: `SAMPLE-${moment().unix().toString()}`,
-            method: '1',
-            payType: '0',
-            creditCard: {
-                memberId: 'me',
-                cardSeq: creditCard.cardSeq
-                // cardPass: ''
-            }
+            object: {
+                typeOf: client.factory.paymentMethodType.CreditCard,
+                amount: amount,
+                orderId: `SAMPLE-${moment().unix().toString()}`,
+                method: '1',
+                creditCard: {
+                    memberId: 'me',
+                    cardSeq: creditCard.cardSeq
+                    // cardPass: ''
+                }
+            },
+            purpose: transaction
         });
         console.log('credit card payment authorized', creditCardPaymentAuth.id);
 
@@ -343,12 +345,14 @@ async function main() {
 
     console.log('setting customer contact...');
     await placeOrderService.setCustomerContact({
-        transactionId: transaction.id,
-        contact: {
-            givenName: 'Taro',
-            familyName: 'Motion',
-            telephone: '+819012345678',
-            email: profile.email
+        id: transaction.id,
+        object: {
+            customerContact: {
+                givenName: 'Taro',
+                familyName: 'Motion',
+                telephone: '+819012345678',
+                email: profile.email
+            }
         }
     });
     console.log('customer contact set');
@@ -364,8 +368,10 @@ async function main() {
 
     console.log('confirming transaction...');
     let result = await placeOrderService.confirm({
-        transactionId: transaction.id,
-        sendEmailMessage: true
+        id: transaction.id,
+        options: {
+            sendEmailMessage: true
+        }
     });
     console.log('transaction confirmed', result.order.orderNumber);
 }
