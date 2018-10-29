@@ -19,7 +19,11 @@ async function main() {
 
     const { totalCount, data } = await eventService.searchScreeningEvents({
         inSessionFrom: moment().toDate(),
-        inSessionThrough: moment().add(1, 'week').toDate(),
+        inSessionThrough: moment().add(1, 'day').toDate(),
+        offers: {
+            availableFrom: moment().toDate(),
+            availableThrough: moment().add(1, 'day').toDate(),
+        }
         // limit: 50,
         // page: 1
     });
