@@ -1,4 +1,4 @@
-const { main } = require('./processPlaceOrderByCreditCard');
+const { main } = require('./processPlaceOrderByAnonymousCreditCard');
 
 setInterval(async () => {
     try {
@@ -6,5 +6,5 @@ setInterval(async () => {
     } catch (error) {
         console.error(error);
     }
-}, 60000);
+}, 2000);
 

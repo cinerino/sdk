@@ -212,13 +212,20 @@ async function main() {
     let amount = seatReservationAuth.result.price;
     console.log('金額は', amount);
 
+    await wait(5000);
+
     // ムビチケ認証
     const movieTickets = [
         {
             typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '3419970198',
+            identifier: '7451009899',
             accessCode: '3896'
         },
+        {
+            typeOf: client.factory.paymentMethodType.MovieTicket,
+            identifier: '6095915590',
+            accessCode: '3896'
+        }
     ];
     const checkMovieTicketAction = await paymentService.checkMovieTicket({
         typeOf: client.factory.paymentMethodType.MovieTicket,
@@ -268,13 +275,14 @@ async function main() {
 
     // ムビチケ承認アクション
     console.log('authorizing mvtk payment...');
-    let movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
-        object: {
-            typeOf: client.factory.paymentMethodType.MovieTicket,
-            amount: 0,
-            movieTickets: pendingReservations.map((reservation, index) => {
-                return {
-                    ...selectedMovieTickets[index],
+    let movieTicketPaymentAuths = await Promise.all(selectedMovieTickets.map(async (movieTicket, index) => {
+        const reservation = pendingReservations[index];
+        return placeOrderService.authorizeMovieTicketPayment({
+            object: {
+                typeOf: client.factory.paymentMethodType.MovieTicket,
+                amount: 0,
+                movieTickets: [{
+                    ...movieTicket,
                     serviceOutput: {
                         reservationFor: {
                             typeOf: reservation.reservationFor.typeOf,
@@ -282,27 +290,30 @@ async function main() {
                         },
                         reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
                     }
-                };
-            })
-        },
-        purpose: transaction
-    });
-    console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
+                }]
+            },
+            purpose: transaction
+        });
+    }));
+    console.log(movieTicketPaymentAuths.length, 'mvtk payment authorized');
 
     await wait(5000);
 
     console.log('voiding mvtk auth...');
-    await placeOrderService.voidPayment(movieTicketPaymentAuth);
+    await Promise.all(movieTicketPaymentAuths.map(async (movieTicketPaymentAuth) => {
+        await placeOrderService.voidPayment(movieTicketPaymentAuth);
+    }))
     console.log('mvtk auth voided');
 
     console.log('authorizing mvtk payment...');
-    movieTicketPaymentAuth = await placeOrderService.authorizeMovieTicketPayment({
-        object: {
-            typeOf: client.factory.paymentMethodType.MovieTicket,
-            amount: 0,
-            movieTickets: pendingReservations.map((reservation, index) => {
-                return {
-                    ...selectedMovieTickets[index],
+    movieTicketPaymentAuths = await Promise.all(selectedMovieTickets.map(async (movieTicket, index) => {
+        const reservation = pendingReservations[index];
+        return placeOrderService.authorizeMovieTicketPayment({
+            object: {
+                typeOf: client.factory.paymentMethodType.MovieTicket,
+                amount: 0,
+                movieTickets: [{
+                    ...movieTicket,
                     serviceOutput: {
                         reservationFor: {
                             typeOf: reservation.reservationFor.typeOf,
@@ -310,12 +321,12 @@ async function main() {
                         },
                         reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
                     }
-                };
-            })
-        },
-        purpose: transaction
-    });
-    console.log('mvtk payment authorized', movieTicketPaymentAuth.id);
+                }]
+            },
+            purpose: transaction
+        });
+    }));
+    console.log(movieTicketPaymentAuths.length, 'mvtk payment authorized');
 
     // 購入者情報入力時間
     // tslint:disable-next-line:no-magic-numbers
