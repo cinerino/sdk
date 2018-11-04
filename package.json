@@ -74,14 +74,14 @@
     "request": "^2.87.0",
     "rimraf": "^2.6.2",
     "sinon": "^6.3.5",
-    "snyk": "^1.105.0",
+    "snyk": "^1.106.1",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-microsoft-contrib": "^5.2.1",
-    "typescript": "^3.1.4"
+    "typescript": "^3.1.6"
   },
   "dependencies": {
-    "@cinerino/api-abstract-client": "^1.0.0-alpha.55",
+    "@cinerino/api-abstract-client": "^1.0.0-alpha.56",
     "debug": "^3.2.6",
     "http-status": "^1.2.0",
     "isomorphic-fetch": "^2.2.1"
