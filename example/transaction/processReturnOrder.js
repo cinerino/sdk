@@ -19,7 +19,7 @@ async function main() {
     const transaction = await returnOrderService.start({
         expires: moment().add(30, 'minutes').toDate(),
         object: {
-            order: { orderNumber: 'MO118-181104-000004' }
+            order: { orderNumber: 'MO118-181108-000006' }
         }
     });
     console.log('transaction started', transaction.id);

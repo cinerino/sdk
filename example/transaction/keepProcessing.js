@@ -6,5 +6,5 @@ setInterval(async () => {
     } catch (error) {
         console.error(error);
     }
-}, 2000);
+}, 10000);
 

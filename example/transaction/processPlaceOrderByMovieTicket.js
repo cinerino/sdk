@@ -218,14 +218,14 @@ async function main() {
     const movieTickets = [
         {
             typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '7451009899',
+            identifier: '8559919013',
             accessCode: '3896'
         },
-        {
-            typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '6095915590',
-            accessCode: '3896'
-        }
+        // {
+        //     typeOf: client.factory.paymentMethodType.MovieTicket,
+        //     identifier: '6095915590',
+        //     accessCode: '3896'
+        // }
     ];
     const checkMovieTicketAction = await paymentService.checkMovieTicket({
         typeOf: client.factory.paymentMethodType.MovieTicket,
@@ -265,13 +265,14 @@ async function main() {
     const movieTicketTypeChargeSpecification = selectedTicketOffer.priceSpecification.priceComponent.find(
         (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
     );
-    const selectedMovieTickets = availableMovieTickets.filter((t) => t.serviceType === movieTicketTypeChargeSpecification.appliesToMovieTicketType);
+    let selectedMovieTickets = availableMovieTickets.filter((t) => t.serviceType === movieTicketTypeChargeSpecification.appliesToMovieTicketType);
     if (selectedMovieTickets.length === 0) {
         throw new Error(`券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} の有効なムビチケが見つかりません`);
     }
     if (selectedMovieTickets.length < pendingReservations.length) {
         throw new Error('有効なムビチケが足りません');
     }
+    selectedMovieTickets = selectedMovieTickets.slice(0, pendingReservations.length);
 
     // ムビチケ承認アクション
     console.log('authorizing mvtk payment...');
