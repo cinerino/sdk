@@ -133,7 +133,8 @@ async function main() {
     if (availableEvents.length === 0) {
         throw new Error('No available events');
     }
-    const screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
+    let screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
+    // screeningEvent = await eventService.findScreeningEventById({ id: '7iribo4jol8uwae' });
 
     // WAITER許可証
     // const passportToken = await request.post(
@@ -178,7 +179,7 @@ async function main() {
     });
     console.log('チケットオファーは以下の通りです')
     console.log(ticketOffers.map((o) => {
-        const unitPriceSpecification = o.priceSpecification.priceComponent
+        const unitPriceSpec = o.priceSpecification.priceComponent
             .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.UnitPriceSpecification)
             .shift();
         const videoFormatCharge = o.priceSpecification.priceComponent
@@ -187,7 +188,7 @@ async function main() {
         const soundFormatCharge = o.priceSpecification.priceComponent
             .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.SoundFormatChargeSpecification)
             .map((s) => `+${s.appliesToSoundFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
-        return `${o.id} ${o.name.ja} ${unitPriceSpecification.price} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge}`
+        return `${o.id} ${o.name.ja} ${unitPriceSpec.price}/${unitPriceSpec.referenceQuantity.value} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge}`
     }).join('\n'));
 
     // 空席検索
@@ -208,15 +209,15 @@ async function main() {
         );
         return movieTicketTypeChargeSpecification === undefined;
     });
-    const selectedTicketOffer = ticketOffers.shift();
+    const selectedTicketOffer = ticketOffers[Math.floor(ticketOffers.length * Math.random())];
     console.log('ticket offer selected', selectedTicketOffer.id);
 
     // 座席をランダムに選択
     const selectedScreeningRoomSection = offers[0].branchCode;
     console.log('screening room section selected', selectedScreeningRoomSection);
     console.log(selectedScreeningRoomSection);
-    const selectedSeatOffer = availableSeatOffers[Math.floor(availableSeatOffers.length * Math.random())];
-    console.log('seat selected', selectedSeatOffer.branchCode);
+    const selectedSeatOffers = availableSeatOffers.slice(0, 2);
+    console.log('seat selected', selectedSeatOffers.map((o) => o.branchCode).join(','));
 
     await wait(5000);
     console.log('authorizing seat reservation...');
@@ -225,15 +226,15 @@ async function main() {
             event: {
                 id: screeningEvent.id
             },
-            acceptedOffer: [
-                {
+            acceptedOffer: selectedSeatOffers.map((selectedSeatOffer) => {
+                return {
                     id: selectedTicketOffer.id,
                     ticketedSeat: {
                         seatNumber: selectedSeatOffer.branchCode,
                         seatSection: selectedScreeningRoomSection
                     }
-                }
-            ],
+                };
+            }),
             notes: 'test from samples'
         },
         purpose: transaction
