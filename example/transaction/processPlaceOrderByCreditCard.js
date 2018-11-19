@@ -342,7 +342,27 @@ async function main() {
     let result = await placeOrderService.confirm({
         id: transaction.id,
         options: {
-            sendEmailMessage: true
+            sendEmailMessage: true,
+            emailTemplate: `
+| #{order.customer.familyName} #{order.customer.givenName} 様
+| この度は、#{order.seller.name}のオンラインチケットサービスにてご購入頂き、誠にありがとうございます。お客様がご購入されましたチケットの情報は下記の通りです。
+| 
+| [注文番号]
+| #{order.orderNumber}
+| 
+| [注文日時]
+| #{order.orderDate}
+| 
+| [確認番号]
+| #{order.confirmationNumber}
+| 
+| [合計]
+| ￥#{order.price}
+| 
+| お問い合わせはこちら
+| #{order.seller.name}
+| TEL：#{order.seller.telephone}
+`
         }
     });
     console.log('transaction confirmed', result.order.orderNumber);
