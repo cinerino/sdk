@@ -27,6 +27,14 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
+    const orderService = new client.service.Order({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient
+    });
+    const deliveryService = new client.service.Delivery({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient
+    });
 
     console.log('finding profile...');
     const profile = await personService.getProfile({ personId: 'me' });
@@ -232,7 +240,16 @@ async function main() {
             sendEmailMessage: true
         }
     });
-    console.log('transaction confirmed', result.order.orderNumber);
+    const order = result.order;
+    console.log('transaction confirmed', order.orderNumber);
+
+    // 管理者として注文作成
+    await orderService.placeOrder({ orderNumber: order.orderNumber });
+    console.log('Order placed');
+
+    // 管理者として注文配送
+    await deliveryService.sendOrder({ orderNumber: order.orderNumber });
+    console.log('Order delivered');
 }
 
 async function wait(waitInMilliseconds) {
