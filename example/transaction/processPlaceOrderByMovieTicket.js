@@ -75,10 +75,10 @@ async function main() {
     const searchScreeningEventsResult = await eventService.searchScreeningEvents({
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
-        inSessionThrough: moment().add(1, 'week').toDate(),
+        inSessionThrough: moment().add(2, 'days').toDate(),
         superEvent: {
             locationBranchCodes: [seller.location.branchCode],
-            workPerformedIdentifiers: ['1622100']
+            workPerformedIdentifiers: ['16421']
         }
     });
     console.log(searchScreeningEventsResult.totalCount, 'events found');
@@ -92,6 +92,20 @@ async function main() {
     }
     const screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
     // const screeningEvent = { id: '405gzn58jnbbx50a' };
+    console.log('Event:', screeningEvent.id, 'で取引を進行します');
+
+    const movieTickets = [
+        {
+            typeOf: client.factory.paymentMethodType.MovieTicket,
+            identifier: '3198910596',
+            accessCode: '3896'
+        },
+        // {
+        //     typeOf: client.factory.paymentMethodType.MovieTicket,
+        //     identifier: '6095915590',
+        //     accessCode: '3896'
+        // }
+    ];
 
     // WAITER許可証
     // const passportToken = await request.post(
@@ -195,7 +209,8 @@ async function main() {
                     ticketedSeat: {
                         seatNumber: selectedSeatOffer.branchCode,
                         seatSection: selectedScreeningRoomSection
-                    }
+                    },
+                    paymentMethod: movieTickets[0]
                 };
             }),
             notes: 'test from samples'
@@ -208,25 +223,13 @@ async function main() {
     if (seatReservationAuth.result === undefined) {
         throw new Error('座席予約承認結果は必ず存在します');
     }
-    const pendingReservations = seatReservationAuth.result.responseBody.object.reservations;
+    // const pendingReservations = seatReservationAuth.result.responseBody.object.reservations;
     let amount = seatReservationAuth.result.price;
     console.log('金額は', amount);
 
     await wait(5000);
 
     // ムビチケ認証
-    const movieTickets = [
-        {
-            typeOf: client.factory.paymentMethodType.MovieTicket,
-            identifier: '8559919013',
-            accessCode: '3896'
-        },
-        // {
-        //     typeOf: client.factory.paymentMethodType.MovieTicket,
-        //     identifier: '6095915590',
-        //     accessCode: '3896'
-        // }
-    ];
     const checkMovieTicketAction = await paymentService.checkMovieTicket({
         typeOf: client.factory.paymentMethodType.MovieTicket,
         movieTickets: movieTickets.map((movieTicket) => {
@@ -265,19 +268,22 @@ async function main() {
     const movieTicketTypeChargeSpecification = selectedTicketOffer.priceSpecification.priceComponent.find(
         (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
     );
-    let selectedMovieTickets = availableMovieTickets.filter((t) => t.serviceType === movieTicketTypeChargeSpecification.appliesToMovieTicketType);
-    if (selectedMovieTickets.length === 0) {
-        throw new Error(`券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} の有効なムビチケが見つかりません`);
-    }
-    if (selectedMovieTickets.length < pendingReservations.length) {
-        throw new Error('有効なムビチケが足りません');
-    }
-    selectedMovieTickets = selectedMovieTickets.slice(0, pendingReservations.length);
+    let selectedMovieTickets = availableMovieTickets;
+    // let selectedMovieTickets = availableMovieTickets.filter((t) => t.serviceType === movieTicketTypeChargeSpecification.appliesToMovieTicketType);
+    // if (selectedMovieTickets.length === 0) {
+    //     throw new Error(`券種区分 ${movieTicketTypeChargeSpecification.appliesToMovieTicketType} の有効なムビチケが見つかりません`);
+    // }
+    // if (selectedMovieTickets.length < selectedSeatOffers.length) {
+    //     throw new Error('有効なムビチケが足りません');
+    // }
+    selectedMovieTickets = selectedMovieTickets.slice(0, selectedSeatOffers.length);
 
     // ムビチケ承認アクション
     console.log('authorizing mvtk payment...');
     let movieTicketPaymentAuths = await Promise.all(selectedMovieTickets.map(async (movieTicket, index) => {
-        const reservation = pendingReservations[index];
+        // const reservation = pendingReservations[index];
+        const selectedSeatOffer = selectedSeatOffers[index];
+
         return placeOrderService.authorizeMovieTicketPayment({
             object: {
                 typeOf: client.factory.paymentMethodType.MovieTicket,
@@ -286,10 +292,15 @@ async function main() {
                     ...movieTicket,
                     serviceOutput: {
                         reservationFor: {
-                            typeOf: reservation.reservationFor.typeOf,
-                            id: reservation.reservationFor.id
+                            typeOf: screeningEvent.typeOf,
+                            id: screeningEvent.id
                         },
-                        reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
+                        reservedTicket: {
+                            ticketedSeat: {
+                                seatNumber: selectedSeatOffer.branchCode,
+                                seatSection: selectedScreeningRoomSection
+                            }
+                        }
                     }
                 }]
             },
@@ -308,7 +319,9 @@ async function main() {
 
     console.log('authorizing mvtk payment...');
     movieTicketPaymentAuths = await Promise.all(selectedMovieTickets.map(async (movieTicket, index) => {
-        const reservation = pendingReservations[index];
+        // const reservation = pendingReservations[index];
+        const selectedSeatOffer = selectedSeatOffers[index];
+
         return placeOrderService.authorizeMovieTicketPayment({
             object: {
                 typeOf: client.factory.paymentMethodType.MovieTicket,
@@ -317,10 +330,15 @@ async function main() {
                     ...movieTicket,
                     serviceOutput: {
                         reservationFor: {
-                            typeOf: reservation.reservationFor.typeOf,
-                            id: reservation.reservationFor.id
+                            typeOf: screeningEvent.typeOf,
+                            id: screeningEvent.id
                         },
-                        reservedTicket: { ticketedSeat: reservation.reservedTicket.ticketedSeat }
+                        reservedTicket: {
+                            ticketedSeat: {
+                                seatNumber: selectedSeatOffer.branchCode,
+                                seatSection: selectedScreeningRoomSection
+                            }
+                        }
                     }
                 }]
             },
