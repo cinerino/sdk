@@ -14,15 +14,24 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    let profile = await personService.getProfile({ personId: 'me' });
+    let profile = await personService.getProfile({});
     console.log(profile);
 
     await personService.updateProfile({
-        personId: 'me',
         familyName: 'Cinerino',
         givenName: 'Taro',
         email: profile.email,
-        telephone: '+819012345678'
+        telephone: profile.telephone,
+        additionalProperty: [
+            {
+                name: 'address',
+                value: 'Tokyo'
+            },
+            {
+                name: 'custom:nationality',
+                value: 'JP'
+            }
+        ]
     });
 }
 
