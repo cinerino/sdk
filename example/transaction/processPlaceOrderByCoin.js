@@ -15,7 +15,7 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    const organizationService = new client.service.Organization({
+    const sellerService = new client.service.Seller({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
@@ -66,8 +66,8 @@ async function main() {
     console.log('your coin balance is', accountOwnershipInfo.typeOfGood.balance);
 
     // 販売劇場検索
-    const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
-    const seller = searchMovieTheatersResult.data[0];
+    const searchSellersResult = await sellerService.search({});
+    const seller = searchSellersResult.data[Math.floor(searchSellersResult.data.length * Math.random())];
     if (seller === undefined) {
         throw new Error('No seller');
     }

@@ -16,7 +16,7 @@ const eventService = new client.service.Event({
     endpoint: process.env.API_ENDPOINT,
     auth: authClient
 });
-const organizationService = new client.service.Organization({
+const sellerService = new client.service.Seller({
     endpoint: process.env.API_ENDPOINT,
     auth: authClient
 });
@@ -34,8 +34,8 @@ async function main() {
     };
 
     // 販売劇場検索
-    const searchMovieTheatersResult = await organizationService.searchMovieTheaters({});
-    const seller = searchMovieTheatersResult.data[Math.floor(searchMovieTheatersResult.data.length * Math.random())];
+    const searchSellersResult = await sellerService.search({});
+    const seller = searchSellersResult.data[Math.floor(searchSellersResult.data.length * Math.random())];
     if (seller === undefined) {
         throw new Error('No seller');
     }
