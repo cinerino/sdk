@@ -121,7 +121,7 @@ async function main() {
     const searchScreeningEventsResult = await eventService.searchScreeningEvents({
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
-        inSessionThrough: moment().add(1, 'week').toDate(),
+        inSessionThrough: moment().add(1, 'day').toDate(),
         superEvent: { locationBranchCodes: [seller.location.branchCode] }
     });
     console.log(searchScreeningEventsResult.totalCount, 'events found');
