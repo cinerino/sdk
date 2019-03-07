@@ -72,16 +72,17 @@ async function main() {
     // });
     // console.log('passportToken published', passportToken);
 
-    console.log('starting transaction...');
+    const identifier = [...Array(10)].map((_, i) => {
+        return {
+            name: `SampleName-${i}`,
+            value: `SampleValue-${i}`
+        };
+    });
+    console.log('starting transaction...', identifier);
     const transaction = await placeOrderService.start({
         expires: moment().add(10, 'minutes').toDate(),
         agent: {
-            identifier: [
-                {
-                    name: 'SampleName',
-                    value: 'SampleValue'
-                }
-            ]
+            identifier: identifier
         },
         seller: {
             typeOf: seller.typeOf,

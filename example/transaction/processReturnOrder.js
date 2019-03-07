@@ -30,7 +30,7 @@ async function main() {
         object: {
             order: {
                 orderNumber: 'MO106-190102-000001',
-                customer: { telephone: '\\+819012345678' }
+                customer: { telephone: '+819012345678' }
             }
         }
     });
