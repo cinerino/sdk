@@ -37,14 +37,13 @@ async function main() {
     });
 
     console.log('finding profile...');
-    const profile = await personService.getProfile({ personId: 'me' });
+    const profile = await personService.getProfile({});
     console.log('profile found');
 
     // 決済に使用するコイン口座を決定する
     let accountOwnershipInfo;
     console.log('searching accounts...');
     const searchAccountsResult = await personOwnershipInfoService.search({
-        personId: 'me',
         typeOfGood: {
             typeOf: client.factory.ownershipInfo.AccountGoodType.Account,
             accountType: client.factory.accountType.Coin
@@ -55,7 +54,6 @@ async function main() {
     if (accountOwnershipInfos.length === 0) {
         console.log('opening account...');
         accountOwnershipInfo = await personOwnershipInfoService.openAccount({
-            personId: 'me',
             name: loginTicket.getUsername(),
             accountType: client.factory.accountType.Coin
         });
@@ -173,7 +171,6 @@ async function main() {
 
     // 口座にコード発行
     const { code } = await personOwnershipInfoService.authorize({
-        personId: 'me',
         ownershipInfoId: accountOwnershipInfo.id
     });
     // 口座所有権をトークン化

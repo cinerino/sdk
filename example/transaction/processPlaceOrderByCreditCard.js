@@ -33,20 +33,18 @@ async function main() {
     });
 
     console.log('finding profile...');
-    const profile = await personService.getProfile({ personId: 'me' });
+    const profile = await personService.getProfile({});
     console.log('profile found');
 
     // 取引に使用するクレジットカードを決定する
     let creditCard;
     console.log('searching credit cards...');
     let creditCards = await personOwnershipInfoService.searchCreditCards({
-        personId: 'me'
     });
     creditCards = creditCards.filter((c) => c.deleteFlag === '0');
     if (creditCards.length === 0) {
         console.log('adding credit card...');
         creditCard = await personService.addCreditCard({
-            personId: 'me',
             creditCard: {
                 cardNo: '4111111111111111',
                 expire: '2020',
@@ -63,7 +61,6 @@ async function main() {
     let pointAccount;
     console.log('searching pointAccounts...');
     const searchAccountsResult = await personOwnershipInfoService.search({
-        personId: 'me',
         typeOfGood: {
             typeOf: client.factory.ownershipInfo.AccountGoodType.Account,
             accountType: client.factory.accountType.Point
@@ -75,7 +72,6 @@ async function main() {
     if (pointAccounts.length === 0) {
         console.log('opening pointAccount...');
         pointAccount = await personOwnershipInfoService.openAccount({
-            personId: 'me',
             name: loginTicket.getUsername(),
             accountType: client.factory.accountType.Point
         }).then((ownershipInfo) => ownershipInfo.typeOfGood);
@@ -108,7 +104,6 @@ async function main() {
 
     //     console.log('会員プログラムに登録します...');
     //     const registerProgramMembershipTask = await personService.registerProgramMembership({
-    //         personId: 'me',
     //         programMembershipId: programMemberships[0].id,
     //         offerIdentifier: programMemberships[0].offers[0].identifier,
     //         sellerType: seller.typeOf,
@@ -259,7 +254,6 @@ async function main() {
         object: {
             typeOf: client.factory.paymentMethodType.CreditCard,
             amount: amount,
-            orderId: `SAMPLE-${moment().unix().toString()}`,
             method: '1',
             payType: '0',
             creditCard: {
@@ -288,7 +282,6 @@ async function main() {
         object: {
             typeOf: client.factory.paymentMethodType.CreditCard,
             amount: amount,
-            orderId: `SAMPLE-${moment().unix().toString()}`,
             method: '1',
             payType: '0',
             creditCard: {
