@@ -146,8 +146,9 @@ async function main() {
     const selectedScreeningRoomSection = offers[0].branchCode;
     console.log('screening room section selected', selectedScreeningRoomSection);
     console.log(selectedScreeningRoomSection);
-    const selectedSeatOffer = availableSeatOffers[Math.floor(availableSeatOffers.length * Math.random())];
-    console.log('seat selected', selectedSeatOffer.branchCode);
+    const selectedSeatOffers = availableSeatOffers.slice(0, 1);
+    // const selectedSeatOffers = availableSeatOffers.slice(0, 50);
+    console.log('seat selected', selectedSeatOffers.map((o) => o.branchCode));
 
     await wait(5000);
     console.log('authorizing seat reservation...');
@@ -156,15 +157,15 @@ async function main() {
             event: {
                 id: screeningEvent.id
             },
-            acceptedOffer: [
-                {
+            acceptedOffer: selectedSeatOffers.map((o) => {
+                return {
                     id: selectedTicketOffer.id,
                     ticketedSeat: {
-                        seatNumber: selectedSeatOffer.branchCode,
+                        seatNumber: o.branchCode,
                         seatSection: selectedScreeningRoomSection
                     }
                 }
-            ],
+            }),
             notes: 'test from samples'
         },
         purpose: transaction
