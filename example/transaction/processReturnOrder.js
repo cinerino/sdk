@@ -29,7 +29,7 @@ async function main() {
         expires: moment().add(30, 'minutes').toDate(),
         object: {
             order: {
-                orderNumber: 'MO106-190102-000001',
+                orderNumber: 'MO118-190418-000002',
                 customer: { telephone: '+819012345678' }
             }
         }
@@ -37,7 +37,32 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     console.log('confirming transaction...');
-    await returnOrderService.confirm(transaction);
+    await returnOrderService.confirm({
+        id: transaction.id,
+        potentialActions: {
+            returnOrder: {
+                potentialActions: {
+                    /**
+                     * クレジットカード返金アクションについてカスタマイズする場合に指定
+                     */
+                    refundCreditCard: [{
+                        object: {
+                            object: [{
+                                paymentMethod: { paymentMethodId: '' }
+                            }]
+                        },
+                        potentialActions: {
+                            sendEmailMessage: {
+                                object: {
+                                    emailTemplate: '| Sample emailTemplate #{order.orderNumber}'
+                                }
+                            }
+                        }
+                    }]
+                }
+            }
+        }
+    });
     console.log('transaction confirmed');
 }
 
