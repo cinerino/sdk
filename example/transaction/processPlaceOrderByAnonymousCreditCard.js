@@ -24,6 +24,10 @@ const placeOrderService = new client.service.txn.PlaceOrder({
     endpoint: process.env.API_ENDPOINT,
     auth: authClient
 });
+const paymentService = new client.service.Payment({
+    endpoint: process.env.API_ENDPOINT,
+    auth: authClient
+});
 
 async function main() {
     // 取引に使用するクレジットカードを決定する
@@ -94,7 +98,7 @@ async function main() {
     });
     console.log('transaction started', transaction.id);
 
-    const numEvents = 3;
+    const numEvents = 1;
     let amount = 0;
 
     for (let i = 0; i < numEvents; i++) {
@@ -109,11 +113,10 @@ async function main() {
 
     // クレジットカードオーソリアクション
     console.log('authorizing credit card payment...');
-    let creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
+    let creditCardPaymentAuth = await paymentService.authorizeCreditCard({
         object: {
             typeOf: client.factory.paymentMethodType.CreditCard,
             amount: amount,
-            orderId: `SAMPLE-${moment().unix().toString()}-${`000${Math.floor(100 * Math.random())}`.slice(-3)}`,
             method: '1',
             payType: '0',
             creditCard: creditCard
@@ -125,15 +128,14 @@ async function main() {
     await wait(5000);
 
     console.log('voiding credit card auth...');
-    await placeOrderService.voidPayment(creditCardPaymentAuth);
+    await paymentService.voidTransaction(creditCardPaymentAuth);
     console.log('credit card auth voided');
 
     console.log('authorizing credit card payment...');
-    creditCardPaymentAuth = await placeOrderService.authorizeCreditCardPayment({
+    creditCardPaymentAuth = await paymentService.authorizeCreditCard({
         object: {
             typeOf: client.factory.paymentMethodType.CreditCard,
             amount: amount,
-            orderId: `SAMPLE-${moment().unix().toString()}-${`000${Math.floor(100 * Math.random())}`.slice(-3)}`,
             method: '1',
             payType: '0',
             creditCard: creditCard
@@ -177,6 +179,7 @@ async function main() {
         }
     });
     console.log('transaction confirmed', result.order.orderNumber);
+
     // 何度確定をコールしても冪等
     console.log('confirming transaction...');
     result = await placeOrderService.confirm({
