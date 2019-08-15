@@ -46,18 +46,18 @@ async function main() {
     };
     // const toLocation = {
     //     typeOf: 'Anonymous',
-    //     name: 'anonymous location'
+    //     name: 'Sample Anonymous To Location'
     // };
 
     const agent = {
         typeOf: client.factory.personType.Person,
-        id: 'agentId',
-        name: 'agentName'
+        id: 'SampleAgentId',
+        name: 'Sample Agent Name'
     };
     const recipient = {
         typeOf: client.factory.personType.Person,
-        id: 'recipientId',
-        name: 'recipientName'
+        id: 'SampleRecipientId',
+        name: 'Sample Recipient Name'
     };
 
     // いまのところ、取引を開始するにあたって、販売者の指定が必要
@@ -71,9 +71,7 @@ async function main() {
         recipient: recipient,
         seller: { typeOf: seller.typeOf, id: seller.id },
         object: {
-            amount: amount,
-            toLocation: toLocation,
-            description: 'test from samples',
+            description: 'Money Transfer Transaction Sample ' + moment().toISOString(),
             authorizeActions: []
         },
         expires: moment().add(5, 'minutes').toDate(),
