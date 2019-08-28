@@ -399,9 +399,7 @@ async function main() {
     console.log('confirming transaction...');
     let result = await placeOrderService.confirm({
         id: transaction.id,
-        options: {
-            sendEmailMessage: true
-        }
+        sendEmailMessage: true
     });
     console.log('transaction confirmed', result.order.orderNumber);
 }

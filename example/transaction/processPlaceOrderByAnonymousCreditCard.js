@@ -174,9 +174,32 @@ async function main() {
     console.log('confirming transaction...');
     let result = await placeOrderService.confirm({
         id: transaction.id,
-        options: {
-            sendEmailMessage: true
-        }
+        potentialActions: {
+            order: {
+                potentialActions: {
+                    informOrder: [
+                        { recipient: { url: 'http://example.com' } }
+                    ],
+                    sendOrder: {
+                        potentialActions: {
+                            informOrder: [
+                                { recipient: { url: 'http://example.com' } }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        sendEmailMessage: true,
+        emailTemplate: `
+| Order from samples
+| 
+| [注文番号]
+| #{order.orderNumber}
+| 
+| [合計]
+| ￥#{order.price}
+`
     });
     console.log('transaction confirmed', result.order.orderNumber);
 
@@ -184,18 +207,14 @@ async function main() {
     console.log('confirming transaction...');
     result = await placeOrderService.confirm({
         id: transaction.id,
-        options: {
-            sendEmailMessage: true
-        }
+        sendEmailMessage: true
     });
     console.log('transaction confirmed', result.order.orderNumber);
     // 何度確定をコールしても冪等
     console.log('confirming transaction...');
     result = await placeOrderService.confirm({
         id: transaction.id,
-        options: {
-            sendEmailMessage: true
-        }
+        sendEmailMessage: true
     });
     console.log('transaction confirmed', result.order.orderNumber);
 }

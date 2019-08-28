@@ -334,9 +334,8 @@ async function main() {
     console.log('confirming transaction...');
     let result = await placeOrderService.confirm({
         id: transaction.id,
-        options: {
-            sendEmailMessage: true,
-            emailTemplate: `
+        sendEmailMessage: true,
+        emailTemplate: `
 | #{order.customer.familyName} #{order.customer.givenName} 様
 | この度は、#{order.seller.name}のオンラインチケットサービスにてご購入頂き、誠にありがとうございます。お客様がご購入されましたチケットの情報は下記の通りです。
 | 
@@ -356,25 +355,20 @@ async function main() {
 | #{order.seller.name}
 | TEL：#{order.seller.telephone}
 `
-        }
     });
     console.log('transaction confirmed', result.order.orderNumber);
     // 何度確定をコールしても冪等
     console.log('confirming transaction...');
     result = await placeOrderService.confirm({
         id: transaction.id,
-        options: {
-            sendEmailMessage: true
-        }
+        sendEmailMessage: true
     });
     console.log('transaction confirmed', result.order.orderNumber);
     // 何度確定をコールしても冪等
     console.log('confirming transaction...');
     result = await placeOrderService.confirm({
         id: transaction.id,
-        options: {
-            sendEmailMessage: true
-        }
+        sendEmailMessage: true
     });
     console.log('transaction confirmed', result.order.orderNumber);
 }
