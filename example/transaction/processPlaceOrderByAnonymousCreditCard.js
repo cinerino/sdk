@@ -100,15 +100,18 @@ async function main() {
 
     const numEvents = 1;
     let amount = 0;
+    const authorizeSeatReservationResults = [];
 
     for (let i = 0; i < numEvents; i++) {
         // イベント決定
         const screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
-        amount += await authorizeSeatReservationByEvent({
+        const authorizeSeatReservationResult = await authorizeSeatReservationByEvent({
             event: screeningEvent,
             seller: seller,
             transaction: transaction
         });
+        amount += authorizeSeatReservationResult.price;
+        authorizeSeatReservationResults.push(authorizeSeatReservationResult);
     }
 
     // クレジットカードオーソリアクション
@@ -170,6 +173,7 @@ async function main() {
     // console.log('取引を中止します...');
     // await placeOrderService.cancel({ transactionId: transaction.id });
     // console.log('取引を中止しました。');
+    const informUrl = 'https://cinerino-telemetry-api-development.azurewebsites.net/organizations/project/cinerino/lineNotify';
 
     console.log('confirming transaction...');
     let result = await placeOrderService.confirm({
@@ -178,12 +182,56 @@ async function main() {
             order: {
                 potentialActions: {
                     informOrder: [
-                        { recipient: { url: 'http://example.com' } }
+                        { recipient: { url: informUrl } }
                     ],
                     sendOrder: {
                         potentialActions: {
+                            confirmReservation: authorizeSeatReservationResults.map((result) => {
+                                return {
+                                    object: {
+                                        typeOf: result.responseBody.typeOf,
+                                        id: result.responseBody.id,
+                                        object: {
+                                            reservations: result.responseBody.object.reservations.map((r) => {
+                                                return {
+                                                    additionalTicketText: 'Custom Additional Ticket Text',
+                                                    id: r.id,
+                                                    reservedTicket: {
+                                                        issuedBy: {
+                                                            typeOf: seller.typeOf,
+                                                            name: seller.name
+                                                        },
+                                                        ticketToken: 'Custom Ticket Token'
+                                                    },
+                                                    underName: {
+                                                        typeOf: transaction.agent.typeOf,
+                                                        id: transaction.agent.id,
+                                                        name: 'Custom Name',
+                                                        familyName: 'Custom Family Name',
+                                                        givenName: 'Custom Given Name',
+                                                        email: 'custom@example.com',
+                                                        telephone: '+819012345678',
+                                                        identifier: [
+                                                            { name: 'customName', value: 'Custom NameValue' }
+                                                        ]
+                                                    }
+                                                };
+                                            })
+                                        },
+                                        potentialActions: {
+                                            reserve: {
+                                                potentialActions: {
+                                                    informReservation: [
+                                                        { recipient: { url: informUrl } }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }),
                             informOrder: [
-                                { recipient: { url: 'http://example.com' } }
+                                { recipient: { url: informUrl } }
                             ]
                         }
                     }
@@ -307,7 +355,7 @@ async function authorizeSeatReservationByEvent(params) {
     const amount = seatReservationAuth.result.price;
     console.log('金額は', amount);
 
-    return amount;
+    return seatReservationAuth.result;
 }
 
 async function wait(waitInMilliseconds) {
