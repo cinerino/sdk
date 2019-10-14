@@ -121,7 +121,6 @@ async function main() {
             typeOf: client.factory.paymentMethodType.CreditCard,
             amount: amount,
             method: '1',
-            payType: '0',
             creditCard: creditCard
         },
         purpose: transaction
@@ -140,7 +139,6 @@ async function main() {
             typeOf: client.factory.paymentMethodType.CreditCard,
             amount: amount,
             method: '1',
-            payType: '0',
             creditCard: creditCard
         },
         purpose: transaction
@@ -152,15 +150,23 @@ async function main() {
     await wait(5000);
 
     console.log('setting customer contact...');
+    const profile = {
+        additionalProperty: [
+            { name: 'SampleId', value: moment().unix().toString() }
+        ],
+        address: 'Tokyo',
+        age: '33',
+        email: 'hello@motionpicture.jp',
+        givenName: 'Taro',
+        familyName: 'Motion',
+        gender: 'Female',
+        name: 'Taro ☆ Motion',
+        telephone: '+819012345678',
+    };
     await placeOrderService.setCustomerContact({
         id: transaction.id,
         object: {
-            customerContact: {
-                givenName: 'Taro',
-                familyName: 'Motion',
-                telephone: '+819012345678',
-                email: 'hello@motionpicture.jp'
-            }
+            customerContact: profile
         }
     });
     console.log('customer contact set');
@@ -176,6 +182,27 @@ async function main() {
     const informUrl = 'https://cinerino-telemetry-api-development.azurewebsites.net/organizations/project/cinerino/lineNotify';
 
     console.log('confirming transaction...');
+    const email = {
+        sender: {
+            name: `♥ ${seller.name.ja} ♥`
+            // email?: string;
+        },
+        // toRecipient: {
+        //     name: 'Another recipient',
+        //     email: 'ilovegadd@gmail.com'
+        // },
+        about: `♥♥♥ ${profile.name}さんへご注文商品が届いております ♥♥♥`,
+        template: `
+| Order from samples
+| 
+| [注文番号]
+| #{order.orderNumber}
+| 
+| [合計]
+| ￥#{order.price}
+`
+    };
+
     let result = await placeOrderService.confirm({
         id: transaction.id,
         potentialActions: {
@@ -232,6 +259,11 @@ async function main() {
                             }),
                             informOrder: [
                                 { recipient: { url: informUrl } }
+                            ],
+                            sendEmailMessage: [
+                                {
+                                    object: email
+                                }
                             ]
                         }
                     }
@@ -239,15 +271,7 @@ async function main() {
             }
         },
         sendEmailMessage: true,
-        emailTemplate: `
-| Order from samples
-| 
-| [注文番号]
-| #{order.orderNumber}
-| 
-| [合計]
-| ￥#{order.price}
-`
+        email: email
     });
     console.log('transaction confirmed', result.order.orderNumber);
 
