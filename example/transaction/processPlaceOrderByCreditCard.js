@@ -168,7 +168,7 @@ async function main() {
     console.log('transaction started', transaction.id);
 
     // 券種検索
-    let ticketOffers = await eventService.searchScreeningEventTicketOffers({
+    let ticketOffers = await eventService.searchTicketOffers({
         event: { id: screeningEvent.id },
         seller: { typeOf: seller.typeOf, id: seller.id },
         store: { id: process.env.TEST_CLIENT_ID },
@@ -188,7 +188,7 @@ async function main() {
     }).join('\n'));
 
     // 空席検索
-    const offers = await eventService.searchScreeningEventOffers({ eventId: screeningEvent.id });
+    const offers = await eventService.searchOffers({ event: screeningEvent });
     console.log(offers.length, 'offers found');
     const seatOffers = offers[0].containsPlace;
     console.log(seatOffers.length, 'seatOffers found');
