@@ -49,7 +49,8 @@ async function main() {
     console.log('ordering from seller...', seller.name.ja);
 
     // イベント検索
-    const searchScreeningEventsResult = await eventService.searchScreeningEvents({
+    const searchScreeningEventsResult = await eventService.search({
+        typeOf: client.factory.chevre.eventType.ScreeningEvent,
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'week').toDate(),

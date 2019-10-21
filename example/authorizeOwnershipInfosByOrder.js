@@ -49,7 +49,7 @@ async function main() {
     });
 
     // ある上映イベントの予約を検索
-    const searchReservationsResult = await reservationService.searchScreeningEventReservations({
+    const searchReservationsResult = await reservationService.search({
         limit: 100,
         page: 1,
         sort: { reservationNumber: client.factory.chevre.sortType.Ascending },

@@ -71,7 +71,8 @@ async function main() {
     }
 
     // イベント検索
-    const searchScreeningEventsResult = await eventService.searchScreeningEvents({
+    const searchScreeningEventsResult = await eventService.search({
+        typeOf: client.factory.chevre.eventType.ScreeningEvent,
         superEvent: { locationBranchCodes: [seller.location.branchCode] },
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'week').toDate()

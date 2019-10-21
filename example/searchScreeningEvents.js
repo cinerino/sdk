@@ -17,7 +17,7 @@ async function main() {
         auth: authClient
     });
 
-    const { totalCount, data } = await eventService.searchScreeningEvents({
+    const { totalCount, data } = await eventService.search({
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'day').toDate(),
         offers: {

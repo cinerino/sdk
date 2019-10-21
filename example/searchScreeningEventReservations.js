@@ -14,7 +14,7 @@ async function main() {
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
-    const { totalCount, data } = await reservationService.searchScreeningEventReservations({
+    const { totalCount, data } = await reservationService.search({
         limit: 1,
         page: 1,
         sort: { reservationNumber: client.factory.chevre.sortType.Ascending },

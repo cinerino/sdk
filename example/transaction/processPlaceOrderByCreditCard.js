@@ -113,7 +113,8 @@ async function main() {
     // }
 
     // イベント検索
-    const searchScreeningEventsResult = await eventService.searchScreeningEvents({
+    const searchScreeningEventsResult = await eventService.search({
+        typeOf: client.factory.chevre.eventType.ScreeningEvent,
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'day').toDate(),
@@ -129,7 +130,7 @@ async function main() {
         throw new Error('No available events');
     }
     let screeningEvent = availableEvents[Math.floor(availableEvents.length * Math.random())];
-    // screeningEvent = await eventService.findScreeningEventById({ id: '7iribo4jol8uwae' });
+    // screeningEvent = await eventService.findById({ id: '7iribo4jol8uwae' });
 
     // WAITER許可証
     // const passportToken = await request.post(
