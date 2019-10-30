@@ -29,6 +29,8 @@ const paymentService = new client.service.Payment({
     auth: authClient
 });
 
+const informUrl = 'https://cinerino-telemetry-api-development.azurewebsites.net/organizations/project/cinerino/lineNotify';
+
 async function main() {
     // 取引に使用するクレジットカードを決定する
     let creditCard = {
@@ -180,7 +182,6 @@ async function main() {
     // console.log('取引を中止します...');
     // await placeOrderService.cancel({ transactionId: transaction.id });
     // console.log('取引を中止しました。');
-    const informUrl = 'https://cinerino-telemetry-api-development.azurewebsites.net/organizations/project/cinerino/lineNotify';
 
     console.log('confirming transaction...');
     const email = {
@@ -240,6 +241,7 @@ async function main() {
                                                         email: 'custom@example.com',
                                                         telephone: '+819012345678',
                                                         identifier: [
+                                                            { name: 'transaction', value: transaction.id },
                                                             { name: 'customName', value: 'Custom NameValue' }
                                                         ]
                                                     }
@@ -250,7 +252,7 @@ async function main() {
                                             reserve: {
                                                 potentialActions: {
                                                     informReservation: [
-                                                        { recipient: { url: informUrl } }
+                                                        // { recipient: { url: informUrl } }
                                                     ]
                                                 }
                                             }
@@ -361,7 +363,12 @@ async function authorizeSeatReservationByEvent(params) {
                     }
                 }
             ],
-            notes: 'test from samples'
+            notes: 'test from samples',
+            // onReservationStatusChanged: {
+            //     informReservation: [
+            //         { recipient: { url: informUrl } }
+            //     ],
+            // }
         },
         purpose: transaction
     });
