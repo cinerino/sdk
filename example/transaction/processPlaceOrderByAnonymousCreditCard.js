@@ -211,7 +211,7 @@ async function main() {
             order: {
                 potentialActions: {
                     informOrder: [
-                        { recipient: { url: informUrl } }
+                        // { recipient: { url: informUrl } }
                     ],
                     sendOrder: {
                         potentialActions: {
@@ -261,7 +261,7 @@ async function main() {
                                 }
                             }),
                             informOrder: [
-                                { recipient: { url: informUrl } }
+                                // { recipient: { url: informUrl } }
                             ],
                             sendEmailMessage: [
                                 {
