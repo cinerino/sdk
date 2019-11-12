@@ -273,6 +273,15 @@ async function main() {
                 }
             }
         },
+        result: {
+            order: {
+                identifier: [
+                    { name: 'sampleOrderIdentifierName1', value: 'sampleOrderIdentifiervalue1' },
+                    { name: 'sampleOrderIdentifierName2', value: 'sampleOrderIdentifiervalue2' }
+                ],
+                url: 'https://example.com'
+            }
+        },
         sendEmailMessage: true,
         email: email
     });

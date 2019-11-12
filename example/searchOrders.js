@@ -21,6 +21,12 @@ async function main() {
         page: 1,
         orderDateFrom: moment().add(-3, 'month').toDate(),
         orderDateThrough: moment().toDate(),
+        // identifier: {
+        //     $in: [
+        //         { name: 'sampleOrderIdentifierName1', value: 'sampleOrderIdentifiervalue1' },
+        //         { name: 'sampleOrderIdentifierName2', value: 'sampleOrderIdentifiervalue2' }
+        //     ]
+        // },
         // customer: {
         //     typeOf: client.factory.personType.Person,
         //     identifiers: [
