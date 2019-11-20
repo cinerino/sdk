@@ -101,7 +101,7 @@ async function main() {
     });
     console.log('transaction started', transaction.id);
 
-    const numEvents = 1;
+    const numEvents = 2;
     let amount = 0;
     const authorizeSeatReservationResults = [];
 
@@ -353,8 +353,9 @@ async function authorizeSeatReservationByEvent(params) {
     const selectedScreeningRoomSection = offers[0].branchCode;
     console.log('screening room section selected', selectedScreeningRoomSection);
     console.log(selectedScreeningRoomSection);
-    const selectedSeatOffer = availableSeatOffers[Math.floor(availableSeatOffers.length * Math.random())];
-    console.log('seat selected', selectedSeatOffer.branchCode);
+    // const selectedSeatOffer = availableSeatOffers[Math.floor(availableSeatOffers.length * Math.random())];
+    const selectedSeatOffers = availableSeatOffers.slice(0, 3);
+    console.log(selectedSeatOffers.length, 'seats selected');
 
     await wait(5000);
     console.log('authorizing seat reservation...');
@@ -363,15 +364,15 @@ async function authorizeSeatReservationByEvent(params) {
             event: {
                 id: screeningEvent.id
             },
-            acceptedOffer: [
-                {
+            acceptedOffer: selectedSeatOffers.map((o) => {
+                return {
                     id: selectedTicketOffer.id,
                     ticketedSeat: {
-                        seatNumber: selectedSeatOffer.branchCode,
+                        seatNumber: o.branchCode,
                         seatSection: selectedScreeningRoomSection
                     }
-                }
-            ],
+                };
+            }),
             notes: 'test from samples',
             // onReservationStatusChanged: {
             //     informReservation: [
