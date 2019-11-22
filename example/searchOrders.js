@@ -19,7 +19,7 @@ async function main() {
     const { totalCount, data } = await orderService.search({
         limit: 10,
         page: 1,
-        orderDateFrom: moment().add(-3, 'month').toDate(),
+        orderDateFrom: moment().add(-1, 'week').toDate(),
         orderDateThrough: moment().toDate(),
         // identifier: {
         //     $in: [

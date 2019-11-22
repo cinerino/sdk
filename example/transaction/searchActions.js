@@ -15,7 +15,7 @@ async function main() {
         auth: authClient
     });
     const actions = await placeOrderService.searchActionsByTransactionId({
-        transactionId: '5b9d94377f9a13009861c80a',
+        id: '5b9d94377f9a13009861c80a',
         sort: { startDate: client.factory.sortType.Ascending }
     });
     console.log(actions);

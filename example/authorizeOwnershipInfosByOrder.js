@@ -8,16 +8,24 @@ const client = require('../lib/index');
 
 async function main() {
     // ここからエンドユーザー
-    const authClient = await auth.login();
-    await authClient.refreshAccessToken();
-    const loginTicket = authClient.verifyIdToken({});
-    console.log('username is', loginTicket.getUsername());
+    const authClient = new client.auth.ClientCredentials({
+        domain: process.env.TEST_AUTHORIZE_SERVER_DOMAIN,
+        clientId: process.env.TEST_CLIENT_ID,
+        clientSecret: process.env.TEST_CLIENT_SECRET,
+        scopes: [],
+        state: ''
+    });
+    // const authClient = await auth.login();
+    // await authClient.refreshAccessToken();
+    // const loginTicket = authClient.verifyIdToken({});
+    // console.log('username is', loginTicket.getUsername());
+
     const orderService = new client.service.Order({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient
     });
     // 電話番号を使用して注文に対してコードを発行
-    const confirmationNumber = '1557';
+    const confirmationNumber = '40';
     const telephone = '+819012345678';
     let order = await orderService.findByConfirmationNumber({
         confirmationNumber: confirmationNumber,
