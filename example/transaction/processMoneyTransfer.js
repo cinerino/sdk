@@ -100,10 +100,21 @@ async function main() {
     });
     console.log('transaction started', transaction.id);
 
+    await moneyTransferService.setProfile({
+        id: transaction.id,
+        agent: {
+            name: 'Sample Name',
+            familyName: 'Sample Family Name',
+            givenName: 'Sample Given Name',
+            telephone: '+819012345678'
+        }
+    });
     await wait(1000);
 
     console.log('confirming transaction...');
-    await moneyTransferService.confirm(transaction);
+    await moneyTransferService.confirm({
+        id: transaction.id
+    });
     console.log('transaction confirmed');
 }
 
