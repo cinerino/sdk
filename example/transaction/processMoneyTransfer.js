@@ -61,13 +61,12 @@ async function main() {
 
     const agent = {
         typeOf: client.factory.personType.Person,
-        id: 'agentId',
-        name: 'agentName'
+        name: 'Sample Agent Name'
     };
     const recipient = {
         typeOf: client.factory.personType.Person,
-        id: 'recipientId',
-        name: 'recipientName'
+        id: 'Sample Recipient ID',
+        name: 'Sample Recipient Name'
     };
 
     // 取引を開始するにあたって、販売者の指定が必要

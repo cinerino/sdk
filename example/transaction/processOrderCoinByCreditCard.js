@@ -71,10 +71,13 @@ async function main() {
 
     // 入金承認
     console.log('authorizing moneyTransfer offer...');
-    let moneyTransaferAuthorization = await offerService.authorizeMoneyTransfer({
+    let moneyTransaferAuthorization = await offerService.authorizeMonetaryAmount({
         object: {
-            typeOf: client.factory.actionType.MoneyTransfer,
-            amount: amount,
+            typeOf: 'Offer',
+            itemOffered: {
+                typeOf: 'MonetaryAmount',
+                value: amount
+            },
             toLocation: toLocation
         },
         purpose: { typeOf: transaction.typeOf, id: transaction.id },
@@ -90,7 +93,9 @@ async function main() {
     await offerService.voidAuthorization({
         id: moneyTransaferAuthorization.id,
         object: {
-            typeOf: moneyTransaferAuthorization.object.typeOf
+            itemOffered: {
+                typeOf: 'MonetaryAmount',
+            },
         },
         purpose: { typeOf: transaction.typeOf, id: transaction.id },
     });
@@ -98,10 +103,13 @@ async function main() {
 
     // 入金承認
     console.log('authorizing moneyTransfer offer...');
-    moneyTransaferAuthorization = await offerService.authorizeMoneyTransfer({
+    moneyTransaferAuthorization = await offerService.authorizeMonetaryAmount({
         object: {
-            typeOf: client.factory.actionType.MoneyTransfer,
-            amount: amount,
+            typeOf: 'Offer',
+            itemOffered: {
+                typeOf: 'MonetaryAmount',
+                value: amount
+            },
             toLocation: toLocation
         },
         purpose: { typeOf: transaction.typeOf, id: transaction.id },
