@@ -80,11 +80,7 @@ async function main() {
             },
             toLocation: toLocation
         },
-        purpose: { typeOf: transaction.typeOf, id: transaction.id },
-        recipient: {
-            typeOf: client.factory.personType.Person,
-            name: 'Sample Recipient Name'
-        }
+        purpose: { typeOf: transaction.typeOf, id: transaction.id }
     });
     console.log('moneyTransfer authorized. id:', moneyTransaferAuthorization.id);
 
@@ -112,11 +108,7 @@ async function main() {
             },
             toLocation: toLocation
         },
-        purpose: { typeOf: transaction.typeOf, id: transaction.id },
-        recipient: {
-            typeOf: client.factory.personType.Person,
-            name: 'Sample Recipient Name'
-        }
+        purpose: { typeOf: transaction.typeOf, id: transaction.id }
     });
     console.log('moneyTransfer authorized. id:', moneyTransaferAuthorization.id);
 
