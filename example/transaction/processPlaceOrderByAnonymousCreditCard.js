@@ -101,6 +101,30 @@ async function main() {
     });
     console.log('transaction started', transaction.id);
 
+    // 購入者情報入力時間
+    // tslint:disable-next-line:no-magic-numbers
+    await wait(5000);
+
+    console.log('setting customer profile...');
+    const profile = {
+        additionalProperty: [
+            { name: 'SampleId', value: moment().unix().toString() }
+        ],
+        address: 'Tokyo',
+        age: '33',
+        email: 'hello@motionpicture.jp',
+        givenName: 'Taro',
+        familyName: 'Motion',
+        gender: 'Female',
+        name: 'Taro ☆ Motion',
+        telephone: '+819012345678',
+    };
+    await placeOrderService.setProfile({
+        id: transaction.id,
+        agent: profile
+    });
+    console.log('customer profile set');
+
     const numEvents = 2;
     let amount = 0;
     const authorizeSeatReservationResults = [];
@@ -147,32 +171,6 @@ async function main() {
         purpose: transaction
     });
     console.log('credit card payment authorized', creditCardPaymentAuth.id);
-
-    // 購入者情報入力時間
-    // tslint:disable-next-line:no-magic-numbers
-    await wait(5000);
-
-    console.log('setting customer contact...');
-    const profile = {
-        additionalProperty: [
-            { name: 'SampleId', value: moment().unix().toString() }
-        ],
-        address: 'Tokyo',
-        age: '33',
-        email: 'hello@motionpicture.jp',
-        givenName: 'Taro',
-        familyName: 'Motion',
-        gender: 'Female',
-        name: 'Taro ☆ Motion',
-        telephone: '+819012345678',
-    };
-    await placeOrderService.setCustomerContact({
-        id: transaction.id,
-        object: {
-            customerContact: profile
-        }
-    });
-    console.log('customer contact set');
 
     // 購入情報確認時間
     // tslint:disable-next-line:no-magic-numbers

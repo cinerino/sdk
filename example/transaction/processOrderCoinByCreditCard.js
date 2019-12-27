@@ -135,11 +135,9 @@ async function main() {
         name: 'Taro ☆ Motion',
         telephone: '+819012345678',
     };
-    await placeOrderService.setCustomerContact({
+    await placeOrderService.setProfile({
         id: transaction.id,
-        object: {
-            customerContact: profile
-        }
+        agent: profile
     });
     console.log('customer profile set');
 

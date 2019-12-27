@@ -212,19 +212,17 @@ async function main() {
     // tslint:disable-next-line:no-magic-numbers
     await wait(5000);
 
-    console.log('setting customer contact...');
-    await placeOrderService.setCustomerContact({
+    console.log('setting customer profile...');
+    await placeOrderService.setProfile({
         id: transaction.id,
-        object: {
-            customerContact: {
-                givenName: 'Taro',
-                familyName: 'Motion',
-                telephone: '+819012345678',
-                email: profile.email
-            }
+        agent: {
+            givenName: 'Taro',
+            familyName: 'Motion',
+            telephone: '+819012345678',
+            email: profile.email
         }
     });
-    console.log('customer contact set');
+    console.log('customer profile set');
 
     // 購入情報確認時間
     // tslint:disable-next-line:no-magic-numbers
