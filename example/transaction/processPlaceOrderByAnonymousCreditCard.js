@@ -16,28 +16,27 @@ const projectId = 'cinerino';
 
 const eventService = new client.service.Event({
     endpoint: process.env.API_ENDPOINT,
-    auth: authClient
+    auth: authClient,
+    project: { id: projectId }
 });
-eventService.setProject({ id: projectId });
 
 const sellerService = new client.service.Seller({
     endpoint: process.env.API_ENDPOINT,
-    auth: authClient
+    auth: authClient,
+    project: { id: projectId }
 });
-
-sellerService.setProject({ id: projectId });
 
 const placeOrderService = new client.service.txn.PlaceOrder({
     endpoint: process.env.API_ENDPOINT,
-    auth: authClient
+    auth: authClient,
+    project: { id: projectId }
 });
-placeOrderService.setProject({ id: projectId });
 
 const paymentService = new client.service.Payment({
     endpoint: process.env.API_ENDPOINT,
-    auth: authClient
+    auth: authClient,
+    project: { id: projectId }
 });
-paymentService.setProject({ id: projectId });
 
 const informUrl = 'https://cinerino-telemetry-api-development.azurewebsites.net/organizations/project/cinerino/lineNotify';
 
