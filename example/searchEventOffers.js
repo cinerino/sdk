@@ -1,3 +1,4 @@
+const fs = require('fs');
 const moment = require('moment');
 
 const auth = require('./auth');
@@ -15,7 +16,7 @@ async function main() {
     const eventService = new client.service.Event({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient,
-        project: { id: 'sskts-development' }
+        project: { id: '' }
     });
 
     // const offers = await eventService.searchOffers({
@@ -23,6 +24,7 @@ async function main() {
     //         id: '12116221020200121901710'
     //     }
     // });
+    // console.log(offers);
     // console.log(offers[0].containsPlace);
     // console.log(offers.length, 'offers returned');
 
@@ -35,6 +37,7 @@ async function main() {
     });
     console.log(offers);
     console.log(offers.length, 'offers returned');
+    // fs.writeFileSync(`${__dirname}/offers.json`, JSON.stringify(offers, null, '    '));
 }
 
 main().then(() => {
