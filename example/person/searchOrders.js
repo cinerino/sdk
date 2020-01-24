@@ -17,8 +17,10 @@ async function main() {
     });
     const { totalCount, data } = await personService.searchOrders({
         personId: 'me',
-        orderDateFrom: moment().add(-1, 'month').toDate(),
-        orderDateThrough: moment().toDate(),
+        orderDate: {
+            $gte: moment().add(-1, 'month').toDate(),
+            $lte: moment().toDate(),
+        },
         limit: 20,
         page: 1,
         sort: {

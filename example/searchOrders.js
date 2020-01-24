@@ -14,7 +14,7 @@ async function main() {
     const orderService = new client.service.Order({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient,
-        project: { id: 'oyatsu-test' }
+        project: { id: 'cinerino' }
     });
 
     const now = new Date();
@@ -28,8 +28,10 @@ async function main() {
                 const { totalCount, data } = await orderService.search({
                     limit: 10,
                     page: 1,
-                    orderDateFrom: moment(now).add(-1, 'month').toDate(),
-                    orderDateThrough: now,
+                    orderDate: {
+                        $gte: moment(now).add(-1, 'month').toDate(),
+                        $lte: now,
+                    },
                     // identifier: {
                     //     $in: [
                     //         { name: 'sampleOrderIdentifierName1', value: 'sampleOrderIdentifiervalue1' },
