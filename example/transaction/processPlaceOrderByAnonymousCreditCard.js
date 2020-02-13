@@ -353,8 +353,10 @@ async function authorizeSeatReservationByEvent(params) {
         );
         return movieTicketTypeChargeSpecification === undefined;
     });
+
     const selectedTicketOffer = ticketOffers.shift();
-    console.log('ticket offer selected', selectedTicketOffer.id);
+    // const selectedTicketOffer = ticketOffers.find((o) => o.identifier === '1001');
+    console.log('ticket offer selected', selectedTicketOffer);
 
     // 座席をランダムに選択
     const selectedScreeningRoomSection = offers[0].branchCode;
@@ -363,6 +365,14 @@ async function authorizeSeatReservationByEvent(params) {
     // const selectedSeatOffer = availableSeatOffers[Math.floor(availableSeatOffers.length * Math.random())];
     const selectedSeatOffers = availableSeatOffers.slice(0, 3);
     console.log(selectedSeatOffers.length, 'seats selected');
+
+
+    // アドオン選択
+    let acceptedAddOns = [];
+    if (Array.isArray(selectedTicketOffer.addOn) && selectedTicketOffer.addOn.length > 0) {
+        acceptedAddOns = [{ id: selectedTicketOffer.addOn[0].id }];
+    }
+    console.log('addOn selected.', acceptedAddOns);
 
     await wait(5000);
     console.log('authorizing seat reservation...');
@@ -377,7 +387,8 @@ async function authorizeSeatReservationByEvent(params) {
                     ticketedSeat: {
                         seatNumber: o.branchCode,
                         seatSection: selectedScreeningRoomSection
-                    }
+                    },
+                    addOn: acceptedAddOns
                 };
             }),
             notes: 'test from samples',
