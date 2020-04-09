@@ -7,29 +7,30 @@ const client = require('../../lib/index');
 
 async function main() {
     // 管理者として操作する場合はこちら
-    const authClient = await auth.login();
-    await authClient.refreshAccessToken();
-    const loginTicket = authClient.verifyIdToken({});
-    console.log('username is', loginTicket.getUsername());
+    // const authClient = await auth.login();
+    // await authClient.refreshAccessToken();
+    // const loginTicket = authClient.verifyIdToken({});
+    // console.log('username is', loginTicket.getUsername());
 
-    // const authClient = new client.auth.ClientCredentials({
-    //     domain: process.env.TEST_AUTHORIZE_SERVER_DOMAIN,
-    //     clientId: process.env.TEST_CLIENT_ID,
-    //     clientSecret: process.env.TEST_CLIENT_SECRET,
-    //     scopes: [],
-    //     state: ''
-    // });
+    const authClient = new client.auth.ClientCredentials({
+        domain: process.env.TEST_AUTHORIZE_SERVER_DOMAIN,
+        clientId: process.env.TEST_CLIENT_ID,
+        clientSecret: process.env.TEST_CLIENT_SECRET,
+        scopes: [],
+        state: ''
+    });
 
     const returnOrderService = new client.service.txn.ReturnOrder({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project: { id: 'cinerino' }
     });
 
     const transaction = await returnOrderService.start({
         expires: moment().add(30, 'minutes').toDate(),
         object: {
             order: {
-                orderNumber: 'CIN8-6243267-0641966',
+                orderNumber: 'CIN7-9780091-4966169',
                 customer: { telephone: '+819012345678' }
             }
         }
