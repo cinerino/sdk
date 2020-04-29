@@ -313,8 +313,6 @@ async function main() {
     console.log('authorizing point award...');
     const pointAwardAuth = await placeOrderService.authorizePointAward({
         object: {
-            amount: 1,
-            toAccountNumber: pointAccount.accountNumber,
             notes: 'Order Incentive'
         },
         purpose: transaction
