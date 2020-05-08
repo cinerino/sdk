@@ -4,6 +4,8 @@
 const moment = require('moment');
 const client = require('../../lib/index');
 
+const projectId = 'cinerino';
+
 const authClient = new client.auth.ClientCredentials({
     domain: process.env.TEST_AUTHORIZE_SERVER_DOMAIN,
     clientId: process.env.TEST_CLIENT_ID,
@@ -14,19 +16,23 @@ const authClient = new client.auth.ClientCredentials({
 
 const offerService = new client.service.Offer({
     endpoint: process.env.API_ENDPOINT,
-    auth: authClient
+    auth: authClient,
+    project: { id: projectId }
 });
 const sellerService = new client.service.Seller({
     endpoint: process.env.API_ENDPOINT,
-    auth: authClient
+    auth: authClient,
+    project: { id: projectId }
 });
 const placeOrderService = new client.service.txn.PlaceOrder({
     endpoint: process.env.API_ENDPOINT,
-    auth: authClient
+    auth: authClient,
+    project: { id: projectId }
 });
 const paymentService = new client.service.Payment({
     endpoint: process.env.API_ENDPOINT,
-    auth: authClient
+    auth: authClient,
+    project: { id: projectId }
 });
 
 async function main() {
@@ -42,9 +48,8 @@ async function main() {
 
     // 入金口座
     const toLocation = {
-        typeOf: client.factory.pecorino.account.TypeOf.Account,
-        accountType: client.factory.accountType.Coin,
-        accountNumber: '30118000911'
+        typeOf: 'PrepaidCard',
+        identifier: '10000052027'
     };
 
     // 販売者検索
@@ -72,34 +77,6 @@ async function main() {
     // 入金承認
     console.log('authorizing moneyTransfer offer...');
     let moneyTransaferAuthorization = await offerService.authorizeMonetaryAmount({
-        object: {
-            typeOf: 'Offer',
-            itemOffered: {
-                typeOf: 'MonetaryAmount',
-                value: amount
-            },
-            toLocation: toLocation
-        },
-        purpose: { typeOf: transaction.typeOf, id: transaction.id }
-    });
-    console.log('moneyTransfer authorized. id:', moneyTransaferAuthorization.id);
-
-    // 入金承認取消
-    console.log('voiding authorization');
-    await offerService.voidAuthorization({
-        id: moneyTransaferAuthorization.id,
-        object: {
-            itemOffered: {
-                typeOf: 'MonetaryAmount',
-            },
-        },
-        purpose: { typeOf: transaction.typeOf, id: transaction.id },
-    });
-    console.log('authorization voided');
-
-    // 入金承認
-    console.log('authorizing moneyTransfer offer...');
-    moneyTransaferAuthorization = await offerService.authorizeMonetaryAmount({
         object: {
             typeOf: 'Offer',
             itemOffered: {

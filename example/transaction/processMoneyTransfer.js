@@ -6,57 +6,43 @@ const moment = require('moment');
 const auth = require('../auth');
 const client = require('../../lib/index');
 
+const projectId = 'cinerino';
+
+const authClient = new client.auth.ClientCredentials({
+    domain: process.env.TEST_AUTHORIZE_SERVER_DOMAIN,
+    clientId: process.env.TEST_CLIENT_ID,
+    clientSecret: process.env.TEST_CLIENT_SECRET,
+    scopes: [],
+    state: ''
+});
+
 async function main() {
-    const authClient = await auth.login();
-    await authClient.refreshAccessToken();
-    const loginTicket = authClient.verifyIdToken({});
-    console.log('username is', loginTicket.getUsername());
+    // const authClient = await auth.login();
+    // await authClient.refreshAccessToken();
+    // const loginTicket = authClient.verifyIdToken({});
+    // console.log('username is', loginTicket.getUsername());
 
     const moneyTransferService = new client.service.txn.MoneyTransfer({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project: { id: projectId }
     });
-
-    const personOwnershipInfoService = new client.service.person.OwnershipInfo({
-        endpoint: process.env.API_ENDPOINT,
-        auth: authClient
-    });
-
-    const ownershipInfoService = new client.service.OwnershipInfo({
-        endpoint: process.env.API_ENDPOINT,
-        auth: authClient
-    });
-
     const sellerService = new client.service.Seller({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project: { id: projectId }
     });
 
-    // 転送元に使用するコイン口座を決定する
-    let accountOwnershipInfo;
-    console.log('searching accounts...');
-    const searchAccountsResult = await personOwnershipInfoService.search({
-        typeOfGood: {
-            typeOf: client.factory.ownershipInfo.AccountGoodType.Account,
-            accountType: client.factory.accountType.Coin
-        }
-    });
-    const accountOwnershipInfos = searchAccountsResult.data
-        .filter((a) => a.typeOfGood.status === client.factory.pecorino.accountStatusType.Opened);
-    if (accountOwnershipInfos.length === 0) {
-        throw new Error('Opened account not found')
-    } else {
-        accountOwnershipInfo = accountOwnershipInfos[0];
-    }
-    console.log('your coin balance is', accountOwnershipInfo.typeOfGood.balance);
+    const amount = 1;
 
-    const amount = 10;
-
-    let fromLocation = accountOwnershipInfo.typeOfGood;
+    let fromLocation = {
+        typeOf: 'PrepaidCard',
+        identifier: '10000052027',
+        accessCode: '123'
+    };
     const toLocation = {
-        typeOf: client.factory.pecorino.account.TypeOf.Account,
-        accountType: client.factory.accountType.Coin,
-        accountNumber: '30118000911'
+        typeOf: 'PrepaidCard',
+        identifier: '40700100025'
     };
 
     const agent = {
@@ -73,13 +59,13 @@ async function main() {
     const searchSellersResult = await sellerService.search({});
     const seller = searchSellersResult.data.shift();
 
-    // 口座にコード発行
-    const { code } = await personOwnershipInfoService.authorize({
-        ownershipInfoId: accountOwnershipInfo.id
-    });
-    // 口座所有権をトークン化
-    const { token } = await ownershipInfoService.getToken({ code });
-    fromLocation = token;
+    // // 口座にコード発行
+    // const { code } = await personOwnershipInfoService.authorize({
+    //     ownershipInfoId: accountOwnershipInfo.id
+    // });
+    // // 口座所有権をトークン化
+    // const { token } = await ownershipInfoService.getToken({ code });
+    // fromLocation = token;
 
     // トークンを使用して口座オーソリアクション
     console.log('starting transaction...');
