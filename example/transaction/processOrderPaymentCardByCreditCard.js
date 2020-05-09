@@ -35,6 +35,12 @@ const paymentService = new client.service.Payment({
     project: { id: projectId }
 });
 
+const productService = new client.service.Product({
+    endpoint: process.env.API_ENDPOINT,
+    auth: authClient,
+    project: { id: projectId }
+});
+
 async function main() {
     // 取引に使用するクレジットカード
     let creditCard = {
@@ -49,6 +55,12 @@ async function main() {
         accountType: client.factory.accountType.Coin,
         accountNumber: '30118000911'
     };
+
+    // プロダクト検索
+    const { data } = await productService.search({
+        typeOf: { $eq: 'PaymentCard' }
+    });
+    const product = data.shift();
 
     // 販売者検索
     const searchSellersResult = await sellerService.search({});
@@ -80,7 +92,7 @@ async function main() {
             id: 'dummy',
             itemOffered: {
                 typeOf: 'PaymentCard',
-                id: '5eaf98ecbcba1736247577b0',
+                id: product.id,
                 serviceOutput: {
                     accessCode: accessCode,
                     name: 'サンプルプリペイドカード',
