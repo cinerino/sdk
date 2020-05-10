@@ -143,13 +143,13 @@ async function main() {
 
     // クレジットカードオーソリアクション
     console.log('authorizing payment...');
-    let creditCardPaymentAuth = await paymentService.authorizePrepaidCard({
+    let creditCardPaymentAuth = await paymentService.authorizePaymentCard({
         object: {
-            typeOf: 'PrepaidCard',
+            typeOf: 'PrepaidPaymentCard',
             amount: amount,
             fromLocation: {
-                typeOf: 'PrepaidCard',
-                identifier: '50022500006',
+                typeOf: 'GiftPaymentCard',
+                identifier: '10000053029',
                 accessCode: '123'
             }
         },

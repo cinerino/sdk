@@ -36,12 +36,12 @@ async function main() {
     const amount = 1;
 
     let fromLocation = {
-        typeOf: 'PrepaidCard',
+        typeOf: 'PrepaidPaymentCard',
         identifier: '10000052027',
         accessCode: '123'
     };
     const toLocation = {
-        typeOf: 'PrepaidCard',
+        typeOf: 'PrepaidPaymentCard',
         identifier: '40700100025'
     };
 

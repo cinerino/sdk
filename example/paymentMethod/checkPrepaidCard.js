@@ -21,9 +21,9 @@ const paymentService = new client.service.Payment({
 });
 
 async function main() {
-    const paymentCard = await paymentService.checkPrepaidCard({
+    const paymentCard = await paymentService.checkPaymentCard({
         object: {
-            typeOf: 'PrepaidCard',
+            typeOf: 'PrepaidPaymentCard',
             identifier: '50022500006',
             accessCode: '123'
         }

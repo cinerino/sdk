@@ -48,7 +48,7 @@ async function main() {
 
     // 入金口座
     const toLocation = {
-        typeOf: 'PrepaidCard',
+        typeOf: 'PrepaidPaymentCard',
         identifier: '10000052027'
     };
 
