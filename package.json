@@ -79,7 +79,7 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "@cinerino/api-abstract-client": "1.0.0-alpha.186",
+    "@cinerino/api-abstract-client": "1.0.0-alpha.187",
     "debug": "^3.2.6",
     "http-status": "^1.4.2",
     "isomorphic-fetch": "^2.2.1"
