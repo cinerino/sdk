@@ -49,18 +49,21 @@ async function main() {
         holderName: 'AA BB'
     };
 
-    // 入金口座
-    const toLocation = {
-        typeOf: client.factory.pecorino.account.TypeOf.Account,
-        accountType: client.factory.accountType.Coin,
-        accountNumber: '30118000911'
-    };
-
     // プロダクト検索
     const { data } = await productService.search({
         typeOf: { $eq: 'PaymentCard' }
+        // typeOf: { $eq: 'MembershipService' }
     });
     const product = data.shift();
+    console.log('ordering product...', product.name.ja);
+
+    // オファー検索
+    const availableOffers = await productService.searchOffers({
+        itemOffered: { id: product.id }
+    });
+    console.log(availableOffers.length, 'offers available');
+    const acceptedOffer = availableOffers[0];
+    console.log('offer selected', acceptedOffer.name.ja);
 
     // 販売者検索
     const searchSellersResult = await sellerService.search({});
@@ -86,17 +89,17 @@ async function main() {
 
     const accessCode = '123';
 
-    let paymentCardAuthorization = await offerService.authorizePaymentCard({
+    let paymentCardAuthorization = await offerService.authorizeProduct({
         object: {
             typeOf: 'Offer',
-            id: 'dummy',
+            id: acceptedOffer.id,
             itemOffered: {
-                typeOf: 'PaymentCard',
+                typeOf: product.typeOf,
                 id: product.id,
                 serviceOutput: {
                     accessCode: accessCode,
                     name: 'サンプルプリペイドカード',
-                    additionalProperty: []
+                    additionalProperty: [{ name: 'sampleName', value: 'sampleValue' }]
                 }
             }
         },
