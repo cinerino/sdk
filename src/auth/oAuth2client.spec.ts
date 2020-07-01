@@ -442,7 +442,9 @@ describe('fetch()', () => {
             .post('/token')
             .reply(OK, { access_token: 'abc123', expires_in: 1 });
 
-        nock(API_ENDPOINT).get('/').reply(OK, {});
+        nock(API_ENDPOINT)
+            .get('/')
+            .reply(OK, {});
     });
 
     afterEach(() => {
@@ -541,13 +543,14 @@ describe('fetch()', () => {
                 refresh_token: 'refresh-token-placeholder'
             };
 
-            await auth.fetch(`${API_ENDPOINT}/access`, { method: 'GET' }, [OK]).catch((err) => err);
+            await auth.fetch(`${API_ENDPOINT}/access`, { method: 'GET' }, [OK])
+                .catch((err) => err);
             assert.equal(auth.credentials.access_token, 'abc123');
             assert(scope.isDone());
         });
     });
 
-    // tslint:disable-next-line:mocha-no-side-effect-code
+    // tslint:disable-next-line:mocha-no-side-effect-code no-null-keyword
     [{}, undefined, null].forEach((headers) => {
         it(`オプションに指定されたヘッダーが${typeof headers}の場合、正常に動作するはず`, async () => {
             const options = {

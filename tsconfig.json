@@ -12,6 +12,11 @@
         "inlineSourceMap": false,
         "inlineSources": false,
         "isolatedModules": false,
+        "lib": [
+            "dom",
+            "es5",
+            "es2015"
+        ],
         "listEmittedFiles": false,
         "listFiles": false,
         "locale": "en-us",
@@ -34,7 +39,7 @@
         "stripInternal": false,
         "suppressExcessPropertyErrors": false,
         "suppressImplicitAnyIndexErrors": false,
-        "target": "es6",
+        "target": "es5",
         "watch": false
     },
     "include": [
@@ -42,5 +47,10 @@
     ],
     "exclude": [
         "**/*.spec.ts"
-    ]
+    ],
+    "ts-node": {
+        "compilerOptions": {
+            "target": "es6"
+        }
+    }
 }
