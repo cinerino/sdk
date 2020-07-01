@@ -22,5 +22,13 @@ interface ICredentials {
    * トークンタイプ
    */
   token_type?: string;
+  refreshToken?: string;
+  expiryDate?: number;
+  expiresIn?: number;
+  accessToken?: string;
+  tokenType?: string;
+  idToken?: string;
+  idTokenPayload?: any;
+  state?: string;
 }
 export default ICredentials;

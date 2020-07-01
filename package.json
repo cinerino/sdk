@@ -16,11 +16,15 @@
     "test": "./test"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:node && npm run build:browser",
+    "build:node": "tsc",
+    "build:browser": "browserify ./browser.js -o ./lib/browser.js",
+    "build:watch": "tsc && concurrently \"tsc -w\" \"npm run watchify\"",
+    "watchify": "watchify ./browser.js -o ./lib/browser.js",
     "check": "npm run tslint",
     "clean": "rimraf ./lib \"npm-debug.log*\" ./docs ./coverage ./.nyc_output",
-    "example": "http-server ./example",
     "doc": "echo \"implementing...\" && exit 0",
+    "example": "copyfiles ./lib/browser.js ./example/browser && http-server ./example/browser",
     "mocha": "mocha",
     "nyc": "nyc mocha \"src/**/*.spec.ts\"",
     "coverage": "npm run nyc && nyc report --reporter=text-lcov | coveralls",
@@ -59,8 +63,12 @@
     "@types/node": "^8.10.61",
     "@types/open": "0.0.29",
     "@types/power-assert": "^1.5.3",
+    "@types/qs": "^6.5.3",
     "@types/request": "^2.48.5",
     "@types/sinon": "^5.0.7",
+    "browserify": "^16.5.1",
+    "concurrently": "^5.2.0",
+    "copyfiles": "^2.3.0",
     "coveralls": "^3.1.0",
     "http-server": "^0.11.1",
     "jwt-decode": "^2.2.0",
@@ -76,12 +84,15 @@
     "ts-node": "^8.10.2",
     "tslint": "^6.1.2",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.9.5"
+    "typescript": "^3.9.5",
+    "watchify": "^3.11.1"
   },
   "dependencies": {
     "@cinerino/api-abstract-client": "^1.0.0",
     "debug": "^3.2.6",
     "http-status": "^1.4.2",
-    "isomorphic-fetch": "^2.2.1"
+    "idtoken-verifier": "^2.0.3",
+    "isomorphic-fetch": "^2.2.1",
+    "qs": "^6.7.2"
   }
 }
