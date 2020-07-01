@@ -2,6 +2,7 @@ node_modules/
 npm-debug.log*
 .vscode/
 .env*
+doc/
 **/*.log
 coverage/
 .nyc_output/
@@ -9,6 +10,6 @@ coverage/
 **/*.js.map
 **/*.d.ts
 !example/**/*.js
-
+!/browser.js
 !.gitignore
 !.gitkeep
