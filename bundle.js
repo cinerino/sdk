@@ -1,0 +1,1 @@
+var cinerino = window.cinerino = require('./lib/browser.js');

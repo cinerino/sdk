@@ -10,6 +10,6 @@ coverage/
 **/*.js.map
 **/*.d.ts
 !example/**/*.js
-!/browser.js
+!/bundle.js
 !.gitignore
 !.gitkeep
