@@ -8,10 +8,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-- クライアント認証クライアントを追加
-- OAuth2認証クライアントを追加
-- インプリシット認証クライアントを追加
-
 ### Changed
 
 ### Deprecated
@@ -21,3 +17,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v1.0.0 - 2020-07-03
+
+### Added
+
+- クライアント認証クライアントを追加
+- OAuth2認証クライアントを追加
+- インプリシット認証クライアントを追加
