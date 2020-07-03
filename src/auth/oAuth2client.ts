@@ -11,7 +11,7 @@ import { Auth, transporters } from '../abstract';
 import ICredentials from './credentials';
 import { ITokenPayload, LoginTicket } from './loginTicket';
 
-const debug = createDebug('mocoin-api-nodejs-client:auth:oAuth2client');
+const debug = createDebug('cinerino-sdk:auth:oAuth2client');
 
 export interface IGenerateAuthUrlOpts {
     scopes: string[];

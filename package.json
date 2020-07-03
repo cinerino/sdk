@@ -1,7 +1,7 @@
 {
-  "name": "@cinerino/api-nodejs-client",
+  "name": "@cinerino/sdk",
   "version": "1.0.0",
-  "description": "Cinerino API Client Library for Node.js",
+  "description": "Cinerino SDK",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": [
@@ -37,7 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cinerino/api-nodejs-client.git"
+    "url": "https://github.com/cinerino/sdk.git"
   },
   "keywords": [
     "cinerino"
@@ -88,7 +88,7 @@
     "watchify": "^3.11.1"
   },
   "dependencies": {
-    "@cinerino/api-abstract-client": "^1.0.0",
+    "@cinerino/api-abstract-client": "^1.1.0",
     "debug": "^3.2.6",
     "http-status": "^1.4.2",
     "idtoken-verifier": "^2.0.3",

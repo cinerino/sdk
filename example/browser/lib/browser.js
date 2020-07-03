@@ -76,7 +76,7 @@ var httpStatus = require("http-status");
 var fetch = require("isomorphic-fetch");
 var querystring = require("querystring");
 var oAuth2client_1 = require("./oAuth2client");
-var debug = createDebug('cinerino-api-nodejs-client:auth');
+var debug = createDebug('cinerino-sdk:auth');
 /**
  * クライアント認証OAuthクライアント
  *
@@ -173,6 +173,8 @@ exports.default = ClientCredentialsClient;
 }).call(this,require("buffer").Buffer)
 },{"./oAuth2client":12,"buffer":334,"debug":347,"http-status":409,"isomorphic-fetch":415,"querystring":448}],4:[function(require,module,exports){
 "use strict";
+// tslint:disable-next-line:no-single-line-block-comment
+/* istanbul ignore file */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -417,7 +419,6 @@ var ImplicitGrantClient = /** @class */ (function (_super) {
                         // hash was already parsed, so we just return it.
                         _a.credentials = _b;
                         debug('credentials:', this.credentials);
-                        console.log('credentials:', this.credentials);
                         return [2 /*return*/, this.credentials];
                 }
             });
@@ -526,6 +527,8 @@ exports.ImplicitGrantClient = ImplicitGrantClient;
 
 },{"./implicitGrantClient/error":5,"./implicitGrantClient/popupAuthenticationHandler":7,"./implicitGrantClient/silentAuthenticationHandler":9,"./implicitGrantClient/silentLogoutHandler":10,"./oAuth2client":12,"debug":347,"idtoken-verifier":410,"qs":442}],5:[function(require,module,exports){
 "use strict";
+// tslint:disable-next-line:no-single-line-block-comment
+/* istanbul ignore file */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -555,6 +558,8 @@ exports.AuthorizeError = AuthorizeError;
 
 },{}],6:[function(require,module,exports){
 "use strict";
+// tslint:disable-next-line:no-single-line-block-comment
+/* istanbul ignore file */
 Object.defineProperty(exports, "__esModule", { value: true });
 var createDebug = require("debug");
 var debug = createDebug('cinerino-api:auth:iframeHandler');
@@ -567,11 +572,16 @@ var IframeHandler = /** @class */ (function () {
         this.callback = options.callback;
         // tslint:disable-next-line:no-magic-numbers
         this.timeout = (options.timeout !== undefined) ? options.timeout : 60 * 1000;
+        // tslint:disable-next-line:no-null-keyword
         this.timeoutCallback = (options.timeoutCallback !== undefined) ? options.timeoutCallback : null;
         this.eventListenerType = (options.eventListenerType !== undefined) ? options.eventListenerType : 'message';
+        // tslint:disable-next-line:no-null-keyword
         this.iframe = null;
+        // tslint:disable-next-line:no-null-keyword
         this.timeoutHandle = null;
+        // tslint:disable-next-line:no-null-keyword
         this.destroyTimeout = null;
+        // tslint:disable-next-line:no-null-keyword
         this.proxyEventListener = null;
         // If no event identifier specified, set default
         this.eventValidator = (options.eventValidator !== undefined) ? options.eventValidator : {
@@ -634,6 +644,8 @@ exports.default = IframeHandler;
 
 },{"debug":347}],7:[function(require,module,exports){
 "use strict";
+// tslint:disable-next-line:no-single-line-block-comment
+/* istanbul ignore file */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -681,6 +693,7 @@ var PopupAuthenticationHandler = /** @class */ (function () {
         this.authenticationUrl = options.authenticationUrl;
         // tslint:disable-next-line:no-magic-numbers
         this.timeout = (options.timeout !== undefined) ? options.timeout : 60 * 1000;
+        // tslint:disable-next-line:no-null-keyword
         this.handler = null;
     }
     PopupAuthenticationHandler.GET_EVENT_VALIDATOR = function () {
@@ -741,6 +754,8 @@ exports.default = PopupAuthenticationHandler;
 
 },{"./error":5,"./popupHandler":8}],8:[function(require,module,exports){
 "use strict";
+// tslint:disable-next-line:no-single-line-block-comment
+/* istanbul ignore file */
 Object.defineProperty(exports, "__esModule", { value: true });
 var createDebug = require("debug");
 var debug = createDebug('cinerino-api:auth:popupHandler');
@@ -753,11 +768,16 @@ var PopupHandler = /** @class */ (function () {
         this.callback = options.callback;
         // tslint:disable-next-line:no-magic-numbers
         this.timeout = (options.timeout !== undefined) ? options.timeout : 60 * 1000;
+        // tslint:disable-next-line:no-null-keyword
         this.timeoutCallback = (options.timeoutCallback !== undefined) ? options.timeoutCallback : null;
         this.eventListenerType = (options.eventListenerType !== undefined) ? options.eventListenerType : 'message';
+        // tslint:disable-next-line:no-null-keyword
         this.popupWindow = null;
+        // tslint:disable-next-line:no-null-keyword
         this.timeoutHandle = null;
+        // tslint:disable-next-line:no-null-keyword
         this.destroyTimeout = null;
+        // tslint:disable-next-line:no-null-keyword
         this.proxyEventListener = null;
         // If no event identifier specified, set default
         this.eventValidator = (options.eventValidator !== undefined) ? options.eventValidator : {
@@ -820,6 +840,8 @@ exports.default = PopupHandler;
 
 },{"debug":347}],9:[function(require,module,exports){
 "use strict";
+// tslint:disable-next-line:no-single-line-block-comment
+/* istanbul ignore file */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -867,6 +889,7 @@ var SilentAuthenticationHandler = /** @class */ (function () {
         this.authenticationUrl = options.authenticationUrl;
         // tslint:disable-next-line:no-magic-numbers
         this.timeout = (options.timeout !== undefined) ? options.timeout : 60 * 1000;
+        // tslint:disable-next-line:no-null-keyword
         this.handler = null;
     }
     SilentAuthenticationHandler.GET_EVENT_VALIDATOR = function () {
@@ -927,6 +950,8 @@ exports.default = SilentAuthenticationHandler;
 
 },{"./error":5,"./iframeHandler":6}],10:[function(require,module,exports){
 "use strict";
+// tslint:disable-next-line:no-single-line-block-comment
+/* istanbul ignore file */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -974,6 +999,7 @@ var SilentLogoutHandler = /** @class */ (function () {
         this.logoutUrl = options.logoutUrl;
         // tslint:disable-next-line:no-magic-numbers
         this.timeout = (options.timeout !== undefined) ? options.timeout : 60 * 1000;
+        // tslint:disable-next-line:no-null-keyword
         this.handler = null;
     }
     SilentLogoutHandler.GET_CALLBACK_HANDLER = function (cb, usePostMessage) {
@@ -1111,7 +1137,7 @@ var fetch = require("isomorphic-fetch");
 var querystring = require("querystring");
 var abstract_1 = require("../abstract");
 var loginTicket_1 = require("./loginTicket");
-var debug = createDebug('mocoin-api-nodejs-client:auth:oAuth2client');
+var debug = createDebug('cinerino-sdk:auth:oAuth2client');
 /**
  * OAuth2 client
  */
@@ -1639,6 +1665,8 @@ var auth;
 /**
  * create OAuth2 client instance using implicit grant
  */
+// tslint:disable-next-line:no-single-line-block-comment
+/* istanbul ignore next */
 function createAuthInstance(options) {
     return new implicitGrantClient_1.ImplicitGrantClient(options);
 }
@@ -34203,30 +34231,36 @@ utils.intFromLE = intFromLE;
 arguments[4][284][0].apply(exports,arguments)
 },{"buffer":288,"dup":284}],376:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^6.5.2",
+  "_args": [
+    [
+      "elliptic@6.5.3",
+      "C:\\projects\\cinerino-sdk"
+    ]
+  ],
+  "_development": true,
+  "_from": "elliptic@6.5.3",
   "_id": "elliptic@6.5.3",
   "_inBundle": false,
   "_integrity": "sha512-IMqzv5wNQf+E6aHeIqATs0tOLeOTwj1QKbRcS3jBbYkl5oLAserA8yJTT7/VyHUYG91PRmPyeQDObKLPpeS4dw==",
   "_location": "/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "elliptic@^6.5.2",
+    "raw": "elliptic@6.5.3",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "^6.5.2",
+    "rawSpec": "6.5.3",
     "saveSpec": null,
-    "fetchSpec": "^6.5.2"
+    "fetchSpec": "6.5.3"
   },
   "_requiredBy": [
     "/browserify-sign",
     "/create-ecdh"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.5.3.tgz",
-  "_shasum": "cb59eb2efdaf73a0bd78ccd7015a62ad6e0f93d6",
-  "_spec": "elliptic@^6.5.2",
-  "_where": "C:\\projects\\cinerino-api-nodejs-client\\node_modules\\browserify-sign",
+  "_spec": "6.5.3",
+  "_where": "C:\\projects\\cinerino-sdk",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -34234,7 +34268,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -34244,7 +34277,6 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",

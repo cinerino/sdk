@@ -6,7 +6,7 @@ import * as querystring from 'querystring';
 import ICredentials from './credentials';
 import OAuth2client from './oAuth2client';
 
-const debug = createDebug('cinerino-api-nodejs-client:auth');
+const debug = createDebug('cinerino-sdk:auth');
 
 export interface IOptions {
     domain: string;
