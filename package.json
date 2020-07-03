@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Cinerino SDK",
   "main": "./lib/index.js",
+  "browser": {
+    "./index.js": "./browser.js"
+  },
   "types": "./lib/index.d.ts",
   "files": [
     "docs",
@@ -18,13 +21,13 @@
   "scripts": {
     "build": "npm run build:node && npm run build:browser",
     "build:node": "tsc",
-    "build:browser": "browserify ./browser.js -o ./lib/browser.js",
+    "build:browser": "browserify ./bundle.js -o ./lib/bundle.js",
     "build:watch": "tsc && concurrently \"tsc -w\" \"npm run watchify\"",
-    "watchify": "watchify ./browser.js -o ./lib/browser.js",
+    "watchify": "watchify ./bundle.js -o ./lib/bundle.js",
     "check": "npm run tslint",
     "clean": "rimraf ./lib \"npm-debug.log*\" ./docs ./coverage ./.nyc_output",
     "doc": "echo \"implementing...\" && exit 0",
-    "example": "copyfiles ./lib/browser.js ./example/browser && http-server ./example/browser",
+    "example": "copyfiles ./lib/bundle.js ./example/browser && http-server ./example/browser",
     "mocha": "mocha",
     "nyc": "nyc mocha \"src/**/*.spec.ts\"",
     "coverage": "npm run nyc && nyc report --reporter=text-lcov | coveralls",
