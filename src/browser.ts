@@ -6,8 +6,6 @@ import { ImplicitGrantClient, IOptions as IImplicitGrantClientOptions } from './
 
 /**
  * factory
- * All object interfaces are here.
- * 全てのオブジェクトのインターフェースはここに含まれます。
  */
 export import factory = factory;
 export import service = service;

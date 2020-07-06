@@ -4,7 +4,8 @@
   "description": "Cinerino SDK",
   "main": "./lib/index.js",
   "browser": {
-    "./lib/index.js": "./lib/browser.js"
+    "./lib/index.js": "./lib/browser.js",
+    "crypto": false
   },
   "types": "./lib/index.d.ts",
   "files": [
