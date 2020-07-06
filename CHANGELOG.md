@@ -16,9 +16,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Fixed
 
-- ブラウザ用モジュールが動作するように調整
-
 ### Security
+
+## v1.0.1 - 2020-07-06
+
+### Fixed
+
+- ブラウザ用モジュールが動作するように調整
 
 ## v1.0.0 - 2020-07-03
 
