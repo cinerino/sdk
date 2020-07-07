@@ -1,6 +1,6 @@
 {
   "name": "@cinerino/sdk",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Cinerino SDK",
   "main": "./lib/index.js",
   "browser": {
