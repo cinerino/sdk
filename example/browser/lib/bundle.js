@@ -2179,8 +2179,6 @@ arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],55:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],56:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],57:[function(require,module,exports){
 "use strict";
 /**
  * 場所タイプ
@@ -2195,15 +2193,15 @@ var PlaceType;
 })(PlaceType || (PlaceType = {}));
 exports.default = PlaceType;
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"dup":13}],58:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],59:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],60:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],61:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -2217,7 +2215,7 @@ var PriceCurrency;
 })(PriceCurrency || (PriceCurrency = {}));
 exports.default = PriceCurrency;
 
-},{}],63:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -2248,9 +2246,9 @@ var PriceSpecificationType;
 })(PriceSpecificationType || (PriceSpecificationType = {}));
 exports.default = PriceSpecificationType;
 
-},{}],64:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],65:[function(require,module,exports){
+},{"dup":13}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var ProgramMembershipType;
@@ -2258,15 +2256,15 @@ var ProgramMembershipType;
     ProgramMembershipType["ProgramMembership"] = "ProgramMembership";
 })(ProgramMembershipType = exports.ProgramMembershipType || (exports.ProgramMembershipType = {}));
 
-},{}],66:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"dup":13}],66:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],67:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],68:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],69:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -2293,7 +2291,7 @@ var ReservationStatusType;
 })(ReservationStatusType || (ReservationStatusType = {}));
 exports.default = ReservationStatusType;
 
-},{}],71:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -2306,9 +2304,17 @@ var ReservationType;
 })(ReservationType || (ReservationType = {}));
 exports.default = ReservationType;
 
-},{}],72:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],73:[function(require,module,exports){
+},{"dup":13}],72:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var PaymentServiceType;
+(function (PaymentServiceType) {
+    PaymentServiceType["MovieTicket"] = "MovieTicket";
+})(PaymentServiceType = exports.PaymentServiceType || (exports.PaymentServiceType = {}));
+
+},{}],73:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Identifier;
@@ -2551,7 +2557,6 @@ var offerType_1 = require("./factory/offerType");
 var OrganizationFactory = require("./factory/organization");
 var organizationType_1 = require("./factory/organizationType");
 var CreditCardFactory = require("./factory/paymentMethod/paymentCard/creditCard");
-var MGTicketFactory = require("./factory/paymentMethod/paymentCard/mgTicket");
 var MovieTicketFactory = require("./factory/paymentMethod/paymentCard/movieTicket");
 var paymentMethodType_1 = require("./factory/paymentMethodType");
 var PermitFactory = require("./factory/permit");
@@ -2570,6 +2575,7 @@ var QualitativeValueFactory = require("./factory/qualitativeValue");
 var QuantitativeValueFactory = require("./factory/quantitativeValue");
 var reservationStatusType_1 = require("./factory/reservationStatusType");
 var reservationType_1 = require("./factory/reservationType");
+var PaymentServiceFactory = require("./factory/service/paymentService");
 var WebAPIServiceFactory = require("./factory/service/webAPI");
 var ServiceTypeFactory = require("./factory/serviceType");
 var sortType_1 = require("./factory/sortType");
@@ -2668,7 +2674,6 @@ var paymentMethod;
     var paymentCard;
     (function (paymentCard) {
         paymentCard.creditCard = CreditCardFactory;
-        paymentCard.mgTicket = MGTicketFactory;
         paymentCard.movieTicket = MovieTicketFactory;
     })(paymentCard = paymentMethod.paymentCard || (paymentMethod.paymentCard = {}));
 })(paymentMethod = exports.paymentMethod || (exports.paymentMethod = {}));
@@ -2708,6 +2713,7 @@ var task;
 })(task = exports.task || (exports.task = {}));
 var service;
 (function (service) {
+    service.paymentService = PaymentServiceFactory;
     service.webAPI = WebAPIServiceFactory;
 })(service = exports.service || (exports.service = {}));
 exports.serviceType = ServiceTypeFactory;
@@ -2728,7 +2734,7 @@ exports.transactionTasksExportationStatus = transactionTasksExportationStatus_1.
 exports.transactionType = transactionType_1.default;
 exports.unitCode = unitCode_1.UnitCode;
 
-},{"./factory/accountTitle":13,"./factory/action/cancel/reservation":16,"./factory/action/interact/inform":17,"./factory/action/interact/register/programMembership":18,"./factory/action/interact/register/service":19,"./factory/action/interact/unRegister/programMembership":20,"./factory/action/reserve":21,"./factory/action/transfer/moneyTransfer":22,"./factory/actionStatusType":14,"./factory/actionType":15,"./factory/categoryCode":23,"./factory/clientUser":24,"./factory/creativeWork/message/email":26,"./factory/creativeWork/movie":27,"./factory/creativeWorkType":25,"./factory/errorCode":28,"./factory/errors":39,"./factory/event/screeningEvent":42,"./factory/event/screeningEventSeries":43,"./factory/eventStatusType":40,"./factory/eventType":41,"./factory/itemAvailability":44,"./factory/language":45,"./factory/monetaryAmount":46,"./factory/offer":47,"./factory/offerCatalog":48,"./factory/offerType":49,"./factory/organization":50,"./factory/organizationType":51,"./factory/paymentMethod/paymentCard/creditCard":53,"./factory/paymentMethod/paymentCard/mgTicket":54,"./factory/paymentMethod/paymentCard/movieTicket":55,"./factory/paymentMethodType":52,"./factory/permit":56,"./factory/place/movieTheater":58,"./factory/place/screeningRoom":59,"./factory/place/screeningRoomSection":60,"./factory/place/seat":61,"./factory/placeType":57,"./factory/priceCurrency":62,"./factory/priceSpecificationType":63,"./factory/product":64,"./factory/programMembership":65,"./factory/project":66,"./factory/propertyValue":67,"./factory/qualitativeValue":68,"./factory/quantitativeValue":69,"./factory/reservationStatusType":70,"./factory/reservationType":71,"./factory/service/webAPI":73,"./factory/serviceType":72,"./factory/sortType":74,"./factory/task/aggregateOnProject":78,"./factory/task/aggregateScreeningEvent":79,"./factory/task/cancelMoneyTransfer":80,"./factory/task/cancelPendingReservation":81,"./factory/task/cancelReservation":82,"./factory/task/importEventCapacitiesFromCOA":83,"./factory/task/importEventsFromCOA":84,"./factory/task/importOffersFromCOA":85,"./factory/task/moneyTransfer":86,"./factory/task/registerService":87,"./factory/task/reserve":88,"./factory/task/triggerWebhook":89,"./factory/taskExecutionResult":75,"./factory/taskName":76,"./factory/taskStatus":77,"./factory/transaction/cancelReservation":93,"./factory/transaction/moneyTransfer":94,"./factory/transaction/registerProgramMembership":95,"./factory/transaction/registerService":96,"./factory/transaction/reserve":97,"./factory/transactionStatusType":90,"./factory/transactionTasksExportationStatus":91,"./factory/transactionType":92,"./factory/unitCode":98}],100:[function(require,module,exports){
+},{"./factory/accountTitle":13,"./factory/action/cancel/reservation":16,"./factory/action/interact/inform":17,"./factory/action/interact/register/programMembership":18,"./factory/action/interact/register/service":19,"./factory/action/interact/unRegister/programMembership":20,"./factory/action/reserve":21,"./factory/action/transfer/moneyTransfer":22,"./factory/actionStatusType":14,"./factory/actionType":15,"./factory/categoryCode":23,"./factory/clientUser":24,"./factory/creativeWork/message/email":26,"./factory/creativeWork/movie":27,"./factory/creativeWorkType":25,"./factory/errorCode":28,"./factory/errors":39,"./factory/event/screeningEvent":42,"./factory/event/screeningEventSeries":43,"./factory/eventStatusType":40,"./factory/eventType":41,"./factory/itemAvailability":44,"./factory/language":45,"./factory/monetaryAmount":46,"./factory/offer":47,"./factory/offerCatalog":48,"./factory/offerType":49,"./factory/organization":50,"./factory/organizationType":51,"./factory/paymentMethod/paymentCard/creditCard":53,"./factory/paymentMethod/paymentCard/movieTicket":54,"./factory/paymentMethodType":52,"./factory/permit":55,"./factory/place/movieTheater":57,"./factory/place/screeningRoom":58,"./factory/place/screeningRoomSection":59,"./factory/place/seat":60,"./factory/placeType":56,"./factory/priceCurrency":61,"./factory/priceSpecificationType":62,"./factory/product":63,"./factory/programMembership":64,"./factory/project":65,"./factory/propertyValue":66,"./factory/qualitativeValue":67,"./factory/quantitativeValue":68,"./factory/reservationStatusType":69,"./factory/reservationType":70,"./factory/service/paymentService":72,"./factory/service/webAPI":73,"./factory/serviceType":71,"./factory/sortType":74,"./factory/task/aggregateOnProject":78,"./factory/task/aggregateScreeningEvent":79,"./factory/task/cancelMoneyTransfer":80,"./factory/task/cancelPendingReservation":81,"./factory/task/cancelReservation":82,"./factory/task/importEventCapacitiesFromCOA":83,"./factory/task/importEventsFromCOA":84,"./factory/task/importOffersFromCOA":85,"./factory/task/moneyTransfer":86,"./factory/task/registerService":87,"./factory/task/reserve":88,"./factory/task/triggerWebhook":89,"./factory/taskExecutionResult":75,"./factory/taskName":76,"./factory/taskStatus":77,"./factory/transaction/cancelReservation":93,"./factory/transaction/moneyTransfer":94,"./factory/transaction/registerProgramMembership":95,"./factory/transaction/registerService":96,"./factory/transaction/reserve":97,"./factory/transactionStatusType":90,"./factory/transactionTasksExportationStatus":91,"./factory/transactionType":92,"./factory/unitCode":98}],100:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -10103,8 +10109,8 @@ var PersonType;
 exports.default = PersonType;
 
 },{}],204:[function(require,module,exports){
-arguments[4][62][0].apply(exports,arguments)
-},{"dup":62}],205:[function(require,module,exports){
+arguments[4][61][0].apply(exports,arguments)
+},{"dup":61}],205:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],206:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
@@ -11106,8 +11112,8 @@ var unauthorized_1 = require("./error/unauthorized");
 exports.Unauthorized = unauthorized_1.default;
 
 },{"./error/alreadyInUse":230,"./error/argument":231,"./error/argumentNull":232,"./error/forbidden":233,"./error/notFound":234,"./error/notImplemented":235,"./error/pecorino":236,"./error/rateLimitExceeded":237,"./error/serviceUnavailable":238,"./error/unauthorized":239}],241:[function(require,module,exports){
-arguments[4][62][0].apply(exports,arguments)
-},{"dup":62}],242:[function(require,module,exports){
+arguments[4][61][0].apply(exports,arguments)
+},{"dup":61}],242:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],243:[function(require,module,exports){
 arguments[4][74][0].apply(exports,arguments)
