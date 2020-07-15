@@ -47,14 +47,14 @@ exports.login = async function () {
                     }
 
                     let credentials = await auth.getToken(code, codeVerifier);
-                    console.log('credentials published', credentials);
+                    // console.log('credentials published', credentials);
 
                     auth.setCredentials(credentials);
 
                     credentials = await auth.refreshAccessToken();
-                    console.log('credentials refreshed', credentials);
+                    // console.log('credentials refreshed', credentials);
 
-                    rl.close();
+                    // rl.close();
                     resolve();
                 });
             });

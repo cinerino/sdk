@@ -18,6 +18,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.3.0 - 2020-07-15
+
+### Changed
+
+- update @cinerino/factory
+
+### Removed
+
+- ssktsムビチケ決済承認サービスを削除
+- 販売者編集を削除
+
 ## v1.2.0 - 2020-07-10
 
 ### Changed

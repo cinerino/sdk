@@ -33,17 +33,22 @@ async function main() {
     });
     console.log(totalCount, 'sellers found', new Date());
     console.log(data.length, 'sellers returned');
+
+    const seller = await sellerService.findById({
+        id: data[0].id
+    });
+    console.log(seller.paymentAccepted);
 }
 
 main().then(() => {
     console.log('success!');
 }).catch(console.error);
 
-setInterval(
-    () => {
-        main().then(() => {
-            console.log('success!');
-        }).catch(console.error);
-    },
-    1000
-);
+// setInterval(
+//     () => {
+//         main().then(() => {
+//             console.log('success!');
+//         }).catch(console.error);
+//     },
+//     10000
+// );
