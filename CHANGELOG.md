@@ -10,9 +10,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- update @cinerino/factory
+
 ### Deprecated
 
 ### Removed
+
+- ssktsムビチケ決済承認サービスを削除
+- 販売者編集を削除
 
 ### Fixed
 
