@@ -2186,18 +2186,19 @@ arguments[4][13][0].apply(exports,arguments)
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],58:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 場所タイプ
  */
-Object.defineProperty(exports, "__esModule", { value: true });
 var PlaceType;
 (function (PlaceType) {
     PlaceType["MovieTheater"] = "MovieTheater";
+    PlaceType["Place"] = "Place";
     PlaceType["ScreeningRoom"] = "ScreeningRoom";
     PlaceType["ScreeningRoomSection"] = "ScreeningRoomSection";
     PlaceType["Seat"] = "Seat";
-})(PlaceType || (PlaceType = {}));
-exports.default = PlaceType;
+})(PlaceType = exports.PlaceType || (exports.PlaceType = {}));
+// export default PlaceType;
 
 },{}],59:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
@@ -2319,6 +2320,7 @@ arguments[4][13][0].apply(exports,arguments)
 Object.defineProperty(exports, "__esModule", { value: true });
 var PaymentServiceType;
 (function (PaymentServiceType) {
+    PaymentServiceType["CreditCard"] = "CreditCard";
     PaymentServiceType["MovieTicket"] = "MovieTicket";
 })(PaymentServiceType = exports.PaymentServiceType || (exports.PaymentServiceType = {}));
 
@@ -2370,6 +2372,7 @@ var TaskName;
      * ウェブフックをたたく
      */
     TaskName["TriggerWebhook"] = "triggerWebhook";
+    TaskName["VoidPayment"] = "voidPayment";
 })(TaskName || (TaskName = {}));
 exports.default = TaskName;
 
@@ -2427,6 +2430,8 @@ arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],93:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],94:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"dup":13}],95:[function(require,module,exports){
 "use strict";
 /**
  * 取引ステータス
@@ -2441,7 +2446,7 @@ var TransactionStatusType;
 })(TransactionStatusType || (TransactionStatusType = {}));
 exports.default = TransactionStatusType;
 
-},{}],95:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 "use strict";
 /**
  * 取引タスクエクスポートステータス
@@ -2464,7 +2469,7 @@ var TransactionTasksExportationStatus;
 })(TransactionTasksExportationStatus || (TransactionTasksExportationStatus = {}));
 exports.default = TransactionTasksExportationStatus;
 
-},{}],96:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -2490,10 +2495,6 @@ var TransactionType;
      */
     TransactionType["Pay"] = "Pay";
     /**
-     * メンバーシップ登録
-     */
-    TransactionType["RegisterProgramMembership"] = "RegisterProgramMembership";
-    /**
      * サービス登録
      * Service: MembershipService,PaymentCard,Account,MoneyTransfer...
      */
@@ -2501,9 +2502,7 @@ var TransactionType;
 })(TransactionType || (TransactionType = {}));
 exports.default = TransactionType;
 
-},{}],97:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],98:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],99:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
@@ -2609,13 +2608,13 @@ var PayTaskFactory = require("./factory/task/pay");
 var RegisterServiceTaskFactory = require("./factory/task/registerService");
 var ReserveTaskFactory = require("./factory/task/reserve");
 var TriggerWebhookTaskFactory = require("./factory/task/triggerWebhook");
+var VoidPaymentTaskFactory = require("./factory/task/voidPayment");
 var TaskExecutionResultFactory = require("./factory/taskExecutionResult");
 var taskName_1 = require("./factory/taskName");
 var taskStatus_1 = require("./factory/taskStatus");
 var CancelReservationTransactionFactory = require("./factory/transaction/cancelReservation");
 var MoneyTransferTransactionFactory = require("./factory/transaction/moneyTransfer");
 var PayTransactionFactory = require("./factory/transaction/pay");
-var RegisterProgramMembershipTransactionFactory = require("./factory/transaction/registerProgramMembership");
 var RegisterServiceTransactionFactory = require("./factory/transaction/registerService");
 var ReserveTransactionFactory = require("./factory/transaction/reserve");
 var transactionStatusType_1 = require("./factory/transactionStatusType");
@@ -2716,7 +2715,7 @@ var place;
     place.screeningRoomSection = ScreeningRoomSectionPlaceFactory;
     place.seat = SeatPlaceFactory;
 })(place = exports.place || (exports.place = {}));
-exports.placeType = placeType_1.default;
+exports.placeType = placeType_1.PlaceType;
 exports.priceSpecificationType = priceSpecificationType_1.default;
 exports.programMembership = ProgramMembershipFactory;
 exports.product = ProductFactory;
@@ -2742,6 +2741,7 @@ var task;
     task.registerService = RegisterServiceTaskFactory;
     task.reserve = ReserveTaskFactory;
     task.triggerWebhook = TriggerWebhookTaskFactory;
+    task.voidPayment = VoidPaymentTaskFactory;
 })(task = exports.task || (exports.task = {}));
 var service;
 (function (service) {
@@ -2758,7 +2758,6 @@ var transaction;
     transaction.cancelReservation = CancelReservationTransactionFactory;
     transaction.moneyTransfer = MoneyTransferTransactionFactory;
     transaction.pay = PayTransactionFactory;
-    transaction.registerProgramMembership = RegisterProgramMembershipTransactionFactory;
     transaction.registerService = RegisterServiceTransactionFactory;
     transaction.reserve = ReserveTransactionFactory;
 })(transaction = exports.transaction || (exports.transaction = {}));
@@ -2767,7 +2766,7 @@ exports.transactionTasksExportationStatus = transactionTasksExportationStatus_1.
 exports.transactionType = transactionType_1.default;
 exports.unitCode = unitCode_1.UnitCode;
 
-},{"./factory/accountTitle":13,"./factory/action/cancel/reservation":16,"./factory/action/check/paymentMethod/movieTicket":17,"./factory/action/interact/inform":18,"./factory/action/interact/register/programMembership":19,"./factory/action/interact/register/service":20,"./factory/action/interact/unRegister/programMembership":21,"./factory/action/reserve":22,"./factory/action/trade/pay":23,"./factory/action/transfer/moneyTransfer":24,"./factory/actionStatusType":14,"./factory/actionType":15,"./factory/categoryCode":25,"./factory/clientUser":26,"./factory/creativeWork/message/email":28,"./factory/creativeWork/movie":29,"./factory/creativeWorkType":27,"./factory/errorCode":30,"./factory/errors":41,"./factory/event/screeningEvent":44,"./factory/event/screeningEventSeries":45,"./factory/eventStatusType":42,"./factory/eventType":43,"./factory/itemAvailability":46,"./factory/language":47,"./factory/monetaryAmount":48,"./factory/offer":49,"./factory/offerCatalog":50,"./factory/offerType":51,"./factory/organization":52,"./factory/organizationType":53,"./factory/paymentMethod/paymentCard/creditCard":55,"./factory/paymentMethod/paymentCard/movieTicket":56,"./factory/paymentMethodType":54,"./factory/permit":57,"./factory/place/movieTheater":59,"./factory/place/screeningRoom":60,"./factory/place/screeningRoomSection":61,"./factory/place/seat":62,"./factory/placeType":58,"./factory/priceCurrency":63,"./factory/priceSpecificationType":64,"./factory/product":65,"./factory/programMembership":66,"./factory/project":67,"./factory/propertyValue":68,"./factory/qualitativeValue":69,"./factory/quantitativeValue":70,"./factory/reservationStatusType":71,"./factory/reservationType":72,"./factory/seller":73,"./factory/service/paymentService":75,"./factory/service/webAPI":76,"./factory/serviceType":74,"./factory/sortType":77,"./factory/task/aggregateOnProject":81,"./factory/task/aggregateScreeningEvent":82,"./factory/task/cancelMoneyTransfer":83,"./factory/task/cancelPendingReservation":84,"./factory/task/cancelReservation":85,"./factory/task/importEventCapacitiesFromCOA":86,"./factory/task/importEventsFromCOA":87,"./factory/task/importOffersFromCOA":88,"./factory/task/moneyTransfer":89,"./factory/task/pay":90,"./factory/task/registerService":91,"./factory/task/reserve":92,"./factory/task/triggerWebhook":93,"./factory/taskExecutionResult":78,"./factory/taskName":79,"./factory/taskStatus":80,"./factory/transaction/cancelReservation":97,"./factory/transaction/moneyTransfer":98,"./factory/transaction/pay":99,"./factory/transaction/registerProgramMembership":100,"./factory/transaction/registerService":101,"./factory/transaction/reserve":102,"./factory/transactionStatusType":94,"./factory/transactionTasksExportationStatus":95,"./factory/transactionType":96,"./factory/unitCode":103}],105:[function(require,module,exports){
+},{"./factory/accountTitle":13,"./factory/action/cancel/reservation":16,"./factory/action/check/paymentMethod/movieTicket":17,"./factory/action/interact/inform":18,"./factory/action/interact/register/programMembership":19,"./factory/action/interact/register/service":20,"./factory/action/interact/unRegister/programMembership":21,"./factory/action/reserve":22,"./factory/action/trade/pay":23,"./factory/action/transfer/moneyTransfer":24,"./factory/actionStatusType":14,"./factory/actionType":15,"./factory/categoryCode":25,"./factory/clientUser":26,"./factory/creativeWork/message/email":28,"./factory/creativeWork/movie":29,"./factory/creativeWorkType":27,"./factory/errorCode":30,"./factory/errors":41,"./factory/event/screeningEvent":44,"./factory/event/screeningEventSeries":45,"./factory/eventStatusType":42,"./factory/eventType":43,"./factory/itemAvailability":46,"./factory/language":47,"./factory/monetaryAmount":48,"./factory/offer":49,"./factory/offerCatalog":50,"./factory/offerType":51,"./factory/organization":52,"./factory/organizationType":53,"./factory/paymentMethod/paymentCard/creditCard":55,"./factory/paymentMethod/paymentCard/movieTicket":56,"./factory/paymentMethodType":54,"./factory/permit":57,"./factory/place/movieTheater":59,"./factory/place/screeningRoom":60,"./factory/place/screeningRoomSection":61,"./factory/place/seat":62,"./factory/placeType":58,"./factory/priceCurrency":63,"./factory/priceSpecificationType":64,"./factory/product":65,"./factory/programMembership":66,"./factory/project":67,"./factory/propertyValue":68,"./factory/qualitativeValue":69,"./factory/quantitativeValue":70,"./factory/reservationStatusType":71,"./factory/reservationType":72,"./factory/seller":73,"./factory/service/paymentService":75,"./factory/service/webAPI":76,"./factory/serviceType":74,"./factory/sortType":77,"./factory/task/aggregateOnProject":81,"./factory/task/aggregateScreeningEvent":82,"./factory/task/cancelMoneyTransfer":83,"./factory/task/cancelPendingReservation":84,"./factory/task/cancelReservation":85,"./factory/task/importEventCapacitiesFromCOA":86,"./factory/task/importEventsFromCOA":87,"./factory/task/importOffersFromCOA":88,"./factory/task/moneyTransfer":89,"./factory/task/pay":90,"./factory/task/registerService":91,"./factory/task/reserve":92,"./factory/task/triggerWebhook":93,"./factory/task/voidPayment":94,"./factory/taskExecutionResult":78,"./factory/taskName":79,"./factory/taskStatus":80,"./factory/transaction/cancelReservation":98,"./factory/transaction/moneyTransfer":99,"./factory/transaction/pay":100,"./factory/transaction/registerService":101,"./factory/transaction/reserve":102,"./factory/transactionStatusType":95,"./factory/transactionTasksExportationStatus":96,"./factory/transactionType":97,"./factory/unitCode":103}],105:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -10216,10 +10215,10 @@ exports.default = TaskStatus;
 },{}],216:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],217:[function(require,module,exports){
-arguments[4][94][0].apply(exports,arguments)
-},{"dup":94}],218:[function(require,module,exports){
 arguments[4][95][0].apply(exports,arguments)
-},{"dup":95}],219:[function(require,module,exports){
+},{"dup":95}],218:[function(require,module,exports){
+arguments[4][96][0].apply(exports,arguments)
+},{"dup":96}],219:[function(require,module,exports){
 "use strict";
 /**
  * 取引タイプ
