@@ -4165,6 +4165,26 @@ var EventService = /** @class */ (function (_super) {
         });
     };
     /**
+     * イベント更新
+     */
+    EventService.prototype.updatePartially = function (params) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.fetch({
+                            uri: "/events/" + params.id,
+                            method: 'PATCH',
+                            body: params,
+                            expectedStatusCodes: [http_status_1.NO_CONTENT]
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /**
      * イベントに対する座席オファー検索
      * @deprecated Use searchSeats
      */
