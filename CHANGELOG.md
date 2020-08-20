@@ -14,11 +14,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Removed
 
-- メンバーシッププログラムサービスを削除
-
 ### Fixed
 
 ### Security
+
+## v1.5.0 - 2020-08-20
+
+### Removed
+
+- メンバーシッププログラムサービスを削除
 
 ## v1.4.0 - 2020-08-03
 
