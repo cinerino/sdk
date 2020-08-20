@@ -52,7 +52,7 @@ exports.login = async function () {
                     auth.setCredentials(credentials);
 
                     credentials = await auth.refreshAccessToken();
-                    // console.log('credentials refreshed', credentials);
+                    console.log('credentials refreshed', credentials);
 
                     // rl.close();
                     resolve();
