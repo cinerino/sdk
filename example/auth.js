@@ -54,7 +54,7 @@ exports.login = async function () {
                     credentials = await auth.refreshAccessToken();
                     console.log('credentials refreshed', credentials);
 
-                    rl.close();
+                    // rl.close();
                     resolve();
                 });
             });
