@@ -333,46 +333,46 @@ async function main() {
 
     await wait(5000);
 
-    // console.log('voiding mvtk auth...');
-    // await Promise.all(movieTicketPaymentAuths.map(async (movieTicketPaymentAuth) => {
-    //     await paymentService.voidTransaction({
-    //         id: movieTicketPaymentAuth.id,
-    //         object: { typeOf: movieTicketPaymentAuth.object.paymentMethod },
-    //         purpose: movieTicketPaymentAuth.purpose
-    //     });
-    // }))
-    // console.log('mvtk auth voided');
+    console.log('voiding mvtk auth...');
+    await Promise.all(movieTicketPaymentAuths.map(async (movieTicketPaymentAuth) => {
+        await paymentService.voidTransaction({
+            id: movieTicketPaymentAuth.id,
+            object: { typeOf: client.factory.chevre.service.paymentService.PaymentServiceType.MovieTicket },
+            purpose: movieTicketPaymentAuth.purpose
+        });
+    }))
+    console.log('mvtk auth voided');
 
-    // console.log('authorizing mvtk payment...');
-    // movieTicketPaymentAuths = await Promise.all(selectedMovieTickets.map(async (movieTicket, index) => {
-    //     // const reservation = pendingReservations[index];
-    //     const selectedSeatOffer = selectedSeatOffers[index];
+    console.log('authorizing mvtk payment...');
+    movieTicketPaymentAuths = await Promise.all(selectedMovieTickets.map(async (movieTicket, index) => {
+        // const reservation = pendingReservations[index];
+        const selectedSeatOffer = selectedSeatOffers[index];
 
-    //     return paymentService.authorizeMovieTicket({
-    //         object: {
-    //             typeOf: client.factory.action.authorize.paymentMethod.any.ResultType.Payment,
-    //             paymentMethod: movieTickets[0].typeOf,
-    //             amount: 0,
-    //             movieTickets: [{
-    //                 ...movieTicket,
-    //                 serviceOutput: {
-    //                     reservationFor: {
-    //                         typeOf: screeningEvent.typeOf,
-    //                         id: screeningEvent.id
-    //                     },
-    //                     reservedTicket: {
-    //                         ticketedSeat: {
-    //                             seatNumber: selectedSeatOffer.branchCode,
-    //                             seatSection: selectedScreeningRoomSection
-    //                         }
-    //                     }
-    //                 }
-    //             }]
-    //         },
-    //         purpose: transaction
-    //     });
-    // }));
-    // console.log(movieTicketPaymentAuths.length, 'mvtk payment authorized');
+        return paymentService.authorizeMovieTicket({
+            object: {
+                typeOf: client.factory.action.authorize.paymentMethod.any.ResultType.Payment,
+                paymentMethod: movieTickets[0].typeOf,
+                amount: 0,
+                movieTickets: [{
+                    ...movieTicket,
+                    serviceOutput: {
+                        reservationFor: {
+                            typeOf: screeningEvent.typeOf,
+                            id: screeningEvent.id
+                        },
+                        reservedTicket: {
+                            ticketedSeat: {
+                                seatNumber: selectedSeatOffer.branchCode,
+                                seatSection: selectedScreeningRoomSection
+                            }
+                        }
+                    }
+                }]
+            },
+            purpose: transaction
+        });
+    }));
+    console.log(movieTicketPaymentAuths.length, 'mvtk payment authorized');
 
     // 購入者情報入力時間
     // tslint:disable-next-line:no-magic-numbers
