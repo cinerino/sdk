@@ -9931,21 +9931,8 @@ exports.default = OrderStatus;
 },{}],197:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
 },{"dup":13}],198:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AccountGoodType = void 0;
-/**
- * 口座タイプ
- */
-var AccountGoodType;
-(function (AccountGoodType) {
-    /**
-     * 口座
-     */
-    AccountGoodType["Account"] = "Account";
-})(AccountGoodType = exports.AccountGoodType || (exports.AccountGoodType = {}));
-
-},{}],199:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"dup":13}],199:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -10001,10 +9988,6 @@ var TaskName;
      * 予約取消
      */
     TaskName["CancelReservation"] = "cancelReservation";
-    /**
-     * 座席予約承認アクション取消
-     */
-    TaskName["CancelSeatReservation"] = "cancelSeatReservation";
     /**
      * 予約確定
      */
@@ -10077,6 +10060,10 @@ var TaskName;
      * サービス登録中止
      */
     TaskName["VoidRegisterService"] = "voidRegisterService";
+    /**
+     * 予約中止
+     */
+    TaskName["VoidReserve"] = "voidReserve";
 })(TaskName || (TaskName = {}));
 exports.default = TaskName;
 
