@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- update @cinerino/factory
+- リソース検索結果のtotalCountを全面的に削除
+
 ### Deprecated
 
 ### Removed
