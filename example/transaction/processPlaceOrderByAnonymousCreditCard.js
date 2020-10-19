@@ -62,7 +62,7 @@ async function main() {
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'week').toDate(),
-        superEvent: { locationBranchCodes: [seller.location.branchCode] }
+        // superEvent: { locationBranchCodes: [seller.location.branchCode] }
     });
     console.log(searchScreeningEventsResult.totalCount, 'events found');
 
@@ -121,7 +121,7 @@ async function main() {
         ],
         address: 'Tokyo',
         age: '33',
-        email: 'hello@motionpicture.jp',
+        email: '',
         givenName: 'Taro',
         familyName: 'Motion',
         gender: 'Female',
@@ -166,7 +166,11 @@ async function main() {
     await wait(5000);
 
     console.log('voiding credit card auth...');
-    await paymentService.voidTransaction(creditCardPaymentAuth);
+    await paymentService.voidTransaction({
+        id: creditCardPaymentAuth.id,
+        object: { typeOf: client.factory.chevre.service.paymentService.PaymentServiceType.CreditCard },
+        purpose: { typeOf: transaction.typeOf, id: transaction.id }
+    });
     console.log('credit card auth voided');
 
     console.log('authorizing credit card payment...');
@@ -384,11 +388,22 @@ async function authorizeSeatReservationByEvent(params) {
             acceptedOffer: selectedSeatOffers.map((o) => {
                 return {
                     id: selectedTicketOffer.id,
-                    ticketedSeat: {
-                        seatNumber: o.branchCode,
-                        seatSection: selectedScreeningRoomSection
-                    },
-                    addOn: acceptedAddOns
+                    // ticketedSeat: {
+                    //     seatNumber: o.branchCode,
+                    //     seatSection: selectedScreeningRoomSection
+                    // },
+                    addOn: acceptedAddOns,
+                    itemOffered: {
+                        serviceOutput: {
+                            reservedTicket: {
+                                ticketedSeat: {
+                                    seatNumber: o.branchCode,
+                                    seatSection: selectedScreeningRoomSection
+                                },
+                            },
+                            additionalProperty: [{ name: 'sampleName', value: 'sampleValue' }]
+                        }
+                    }
                 };
             }),
             notes: 'test from samples',

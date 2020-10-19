@@ -29,7 +29,8 @@ async function main() {
 
     const { totalCount, data } = await sellerService.search({
         limit: 10,
-        page: 1
+        page: 1,
+        // location: { branchCodes: ['120'] }
     });
     console.log(totalCount, 'sellers found', new Date());
     console.log(data.length, 'sellers returned');

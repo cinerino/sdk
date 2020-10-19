@@ -112,7 +112,7 @@ async function main() {
         ],
         address: 'Tokyo',
         age: '33',
-        email: 'hello@motionpicture.jp',
+        email: '',
         givenName: 'Taro',
         familyName: 'Motion',
         gender: 'Female',

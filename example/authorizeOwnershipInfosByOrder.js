@@ -22,11 +22,12 @@ async function main() {
 
     const orderService = new client.service.Order({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project: { id: 'cinerino' }
     });
     // 電話番号を使用して注文に対してコードを発行
-    const confirmationNumber = '40';
-    const telephone = '+819012345678';
+    const confirmationNumber = '2701';
+    const telephone = '+81362778824';
     let order = await orderService.findByConfirmationNumber({
         confirmationNumber: confirmationNumber,
         customer: {
@@ -38,12 +39,12 @@ async function main() {
         orderNumber: order.orderNumber,
         customer: {
             telephone: telephone
-        }
+        },
+        // expiresInSeconds: 0
     });
     const code = order.acceptedOffers[0].itemOffered.reservedTicket.ticketToken;
     console.log('QR code published.', code);
     // ここまでエンドユーザー
-
 
     // ここから管理者ユーザー
     const adminAuthClient = await authAsAdmin.login();
