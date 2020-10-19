@@ -22,8 +22,8 @@ const movieTickets = [
     // },
     {
         typeOf: client.factory.paymentMethodType.MGTicket,
-        identifier: "AA6459476",
-        accessCode: "64926475679",
+        identifier: "AA6729287",
+        accessCode: "67608427695",
     }
 ];
 
@@ -47,7 +47,7 @@ async function main() {
     const seller = { typeOf: 'MovieTheater', id: '5d0abf30ac3fb200198ebb2c' };
     console.log('ordering from seller...', seller.id);
 
-    const screeningEvent = { id: '120162210202009221200920' };
+    const screeningEvent = { id: '120162210202010071202250' };
     console.log('Event:', screeningEvent.id, 'で取引を進行します');
 
     console.log('starting transaction...');
@@ -65,7 +65,7 @@ async function main() {
 
     const selectedSeat = {
         seatSection: '   ',
-        seatNumber: 'ａ－１２',
+        seatNumber: 'ａ－８',
     };
 
     console.log('authorizing seat reservation...');
@@ -89,6 +89,12 @@ async function main() {
                     mvtkKbnKensyu: '8200002',
                     mvtkSalesPrice: 1400,
                     kbnMgtk: 'MG'
+                },
+                itemOffered: {
+                    serviceOutput: {
+                        additionalProperty: [{ name: 'sampleName', value: 'sampleValue' }],
+                        additionalTicketText: 'sample additionalTicketText'
+                    }
                 }
             }],
         },

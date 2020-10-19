@@ -124,7 +124,7 @@ async function main() {
 
     console.log('setting customer profile...');
     const profile = {
-        email: 'hello@motionpicture.jp',
+        email: '',
         givenName: 'Taro',
         familyName: 'Motion',
         name: 'Taro ☆ Motion',
