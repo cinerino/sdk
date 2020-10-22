@@ -39,11 +39,15 @@ async function main() {
     });
     console.log('order found');
     const { code } = await orderService.authorize({
-        orderNumber: order.orderNumber,
-        customer: {
-            telephone: telephone
+        object: {
+            orderNumber: order.orderNumber,
+            customer: {
+                telephone: telephone
+            },
         },
-        // expiresInSeconds: 0
+        result: {
+            expiresInSeconds: 10
+        }
     });
     console.log('QR code published.', code);
     // ここまでエンドユーザー
