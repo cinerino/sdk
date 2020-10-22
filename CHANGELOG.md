@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
+- 注文承認を追加
+- 予約使用を追加
+- トークンサービスを塚
+
 ### Changed
+
+- 注文照会パラメータ拡張
 
 ### Deprecated
 

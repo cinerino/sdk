@@ -22,7 +22,7 @@ async function main() {
     // const loginTicket = authClient.verifyIdToken({});
     // console.log('username is', loginTicket.getUsername());
 
-    const orderService = new client.service.Order({
+    let orderService = new client.service.Order({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient,
         project: project
@@ -34,23 +34,30 @@ async function main() {
         confirmationNumber: confirmationNumber,
         customer: {
             telephone: telephone
-        }
+        },
+        // orderNumber: 'CIN8-6497443-8883376'
     });
     console.log('order found');
-    order = await orderService.authorizeOwnershipInfos({
+    const { code } = await orderService.authorize({
         orderNumber: order.orderNumber,
         customer: {
             telephone: telephone
         },
         // expiresInSeconds: 0
     });
-    const code = order.acceptedOffers[0].itemOffered.reservedTicket.ticketToken;
     console.log('QR code published.', code);
     // ここまでエンドユーザー
+
+    const reservationId = order.acceptedOffers[0].itemOffered.id;
 
     // ここから管理者ユーザー
     const adminAuthClient = await authAsAdmin.login();
     const ownershipInfoService = new client.service.OwnershipInfo({
+        endpoint: process.env.API_ENDPOINT,
+        auth: adminAuthClient,
+        project: project
+    });
+    const tokenService = new client.service.Token({
         endpoint: process.env.API_ENDPOINT,
         auth: adminAuthClient,
         project: project
@@ -61,49 +68,26 @@ async function main() {
         project: project
     });
 
-    // ある上映イベントの予約を検索
-    const searchReservationsResult = await reservationService.search({
-        limit: 100,
-        page: 1,
-        sort: { reservationNumber: client.factory.chevre.sortType.Ascending },
-        reservationStatuses: [
-            client.factory.chevre.reservationStatusType.ReservationConfirmed,
-            client.factory.chevre.reservationStatusType.ReservationCancelled,
-            client.factory.chevre.reservationStatusType.ReservationHold,
-            client.factory.chevre.reservationStatusType.ReservationPending
-        ],
-        reservationFor: {
-            typeOf: client.factory.chevre.eventType.ScreeningEvent,
-            id: 'bkeuvae59'
-        }
-    });
-    console.log(searchReservationsResult.totalCount, 'reservations found');
-    console.log(searchReservationsResult.data.length, 'reservations returned');
-
     // 受け取ったコードをトークンに変換
     console.log('getting token by code...');
-    const { token } = await ownershipInfoService.getToken({ code });
+    const { token } = await tokenService.getToken({ code });
     console.log('token created.', token.substr(0, 10), '................', token.substr(-10));
-    // トークン(jsonwebtoken)をデコード(デコード結果は所有権)
+    // トークン(jsonwebtoken)をデコード(デコード結果は注文)
     const payload = decode(token);
-    const reservationByToken = payload.typeOfGood;
-    console.log('token decoded. reservation is', reservationByToken.typeOf, reservationByToken.id);
+    order = payload;
+    console.log('token decoded. order is', order.typeOf, order.orderNumber);
 
-    // 利用可能な予約かどうか確認
-    const availableReservation = searchReservationsResult.data
-        .filter((r) => r.reservationStatus === client.factory.chevre.reservationStatusType.ReservationConfirmed)
-        .find((r) => r.id === reservationByToken.id);
-    const isAvailable = availableReservation !== undefined;
-    console.log('is available?', isAvailable);
-
-    // ベストエフォートでトークンをリモートチェック(チェックすれば履歴が残る)
+    // ベストエフォートで入場
     console.log('checking token...');
-    await reservationService.findScreeningEventReservationByToken({ token: token });
+    await reservationService.useByToken({
+        object: { id: reservationId },
+        instrument: { token: token }
+    });
     console.log('token is valid');
 
     // トークンのチェック履歴を検索
     console.log('searching actions...');
-    const searchCheckActionsResult = await ownershipInfoService.searchCheckTokenActions({ id: payload.id });
+    const searchCheckActionsResult = await ownershipInfoService.searchCheckTokenActions({ id: '10dcd662-7744-4aca-adff-31d10dbb8b0d' });
     console.log(searchCheckActionsResult.data.length, 'actions returned');
     // ここまで管理者ユーザー
 }
