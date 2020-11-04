@@ -242,7 +242,7 @@ async function main() {
     console.log('transaction confirmed', order.orderNumber);
 
     // 管理者として注文作成
-    await orderService.placeOrder({ orderNumber: order.orderNumber });
+    await orderService.placeOrder({ object: { orderNumber: order.orderNumber } });
     console.log('Order placed');
 
     // 管理者として注文配送

@@ -18,6 +18,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.16.0 - 2020-11-04
+
+### Added
+
+- 注文承認を追加
+- 予約使用を追加
+- トークンサービスを追加
+- 予約使用アクション検索を追加
+
+### Changed
+
+- 注文照会パラメータ拡張
+- トークンでの予約照会のレスポンスを削除
+- 注文作成をcustomerロールでも実行可能に拡張
+
 ## v1.15.0 - 2020-10-19
 
 ### Added

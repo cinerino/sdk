@@ -6,6 +6,8 @@ const auth = require('./auth');
 const authAsAdmin = require('./authAsAdmin');
 const client = require('../lib/index');
 
+const project = { id: 'cinerino' };
+
 async function main() {
     // ここからエンドユーザー
     const authClient = new client.auth.ClientCredentials({
@@ -23,7 +25,7 @@ async function main() {
     const orderService = new client.service.Order({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient,
-        project: { id: 'cinerino' }
+        project: project
     });
     // 電話番号を使用して注文に対してコードを発行
     const confirmationNumber = '2701';
@@ -50,11 +52,13 @@ async function main() {
     const adminAuthClient = await authAsAdmin.login();
     const ownershipInfoService = new client.service.OwnershipInfo({
         endpoint: process.env.API_ENDPOINT,
-        auth: adminAuthClient
+        auth: adminAuthClient,
+        project: project
     });
     const reservationService = new client.service.Reservation({
         endpoint: process.env.API_ENDPOINT,
-        auth: adminAuthClient
+        auth: adminAuthClient,
+        project: project
     });
 
     // ある上映イベントの予約を検索
@@ -70,7 +74,7 @@ async function main() {
         ],
         reservationFor: {
             typeOf: client.factory.chevre.eventType.ScreeningEvent,
-            id: 'xdfl9ckjmjr61dw'
+            id: 'bkeuvae59'
         }
     });
     console.log(searchReservationsResult.totalCount, 'reservations found');
@@ -98,10 +102,9 @@ async function main() {
     console.log('token is valid');
 
     // トークンのチェック履歴を検索
-    console.log('searching check token actions...');
+    console.log('searching actions...');
     const searchCheckActionsResult = await ownershipInfoService.searchCheckTokenActions({ id: payload.id });
-    console.log(searchCheckActionsResult.totalCount, 'checkTokenActions found');
-    console.log(searchCheckActionsResult.data.length, 'checkTokenActions returned');
+    console.log(searchCheckActionsResult.data.length, 'actions returned');
     // ここまで管理者ユーザー
 }
 
