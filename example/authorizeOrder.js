@@ -46,7 +46,7 @@ async function main() {
             },
         },
         result: {
-            expiresInSeconds: 10
+            expiresInSeconds: 60
         }
     });
     console.log('QR code published.', code);
@@ -56,11 +56,7 @@ async function main() {
 
     // ここから管理者ユーザー
     const adminAuthClient = await authAsAdmin.login();
-    const ownershipInfoService = new client.service.OwnershipInfo({
-        endpoint: process.env.API_ENDPOINT,
-        auth: adminAuthClient,
-        project: project
-    });
+
     const tokenService = new client.service.Token({
         endpoint: process.env.API_ENDPOINT,
         auth: adminAuthClient,
@@ -81,7 +77,7 @@ async function main() {
     order = payload;
     console.log('token decoded. order is', order.typeOf, order.orderNumber);
 
-    // ベストエフォートで入場
+    // 入場
     console.log('checking token...');
     await reservationService.useByToken({
         object: { id: reservationId },
@@ -89,10 +85,10 @@ async function main() {
     });
     console.log('token is valid');
 
-    // トークンのチェック履歴を検索
+    // 入場履歴を検索
     console.log('searching actions...');
-    const searchCheckActionsResult = await ownershipInfoService.searchCheckTokenActions({ id: '10dcd662-7744-4aca-adff-31d10dbb8b0d' });
-    console.log(searchCheckActionsResult.data.length, 'actions returned');
+    const searchUseActionsResult = await reservationService.searchUseActions({ object: { id: reservationId } });
+    console.log(searchUseActionsResult.data.length, 'actions returned');
     // ここまで管理者ユーザー
 }
 

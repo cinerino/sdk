@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - 注文承認を追加
 - 予約使用を追加
 - トークンサービスを追加
+- 予約使用アクション検索を追加
 
 ### Changed
 
