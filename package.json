@@ -1,6 +1,6 @@
 {
   "name": "@cinerino/sdk",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "description": "Cinerino SDK",
   "main": "./lib/index.js",
   "browser": {
@@ -69,6 +69,7 @@
     "@types/power-assert": "^1.5.3",
     "@types/qs": "^6.5.3",
     "@types/request": "^2.48.5",
+    "@types/request-promise-native": "^1.0.17",
     "@types/sinon": "^5.0.7",
     "browserify": "^16.5.1",
     "concurrently": "^5.2.0",
@@ -92,7 +93,7 @@
     "watchify": "^3.11.1"
   },
   "dependencies": {
-    "@cinerino/api-abstract-client": "^1.19.0",
+    "@cinerino/api-abstract-client": "^1.19.1",
     "debug": "^3.2.6",
     "http-status": "^1.4.2",
     "idtoken-verifier": "^2.0.3",

@@ -18,6 +18,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.16.1 - 2020-11-05
+
+### Changed
+
+- MoneyTransferアクションのamountがMonetaryAmount型の場合に対応
+- update @cinerino/factory
+
 ## v1.16.0 - 2020-11-04
 
 ### Added
