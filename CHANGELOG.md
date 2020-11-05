@@ -10,9 +10,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
-- MoneyTransferアクションのamountがMonetaryAmount型の場合に対応
-- update @cinerino/factory
-
 ### Deprecated
 
 ### Removed
@@ -20,6 +17,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v1.16.1 - 2020-11-05
+
+### Changed
+
+- MoneyTransferアクションのamountがMonetaryAmount型の場合に対応
+- update @cinerino/factory
 
 ## v1.16.0 - 2020-11-04
 
