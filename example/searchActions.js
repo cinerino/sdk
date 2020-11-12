@@ -1,5 +1,5 @@
 /**
- * 注文アクション検索
+ * アクション検索
  */
 const util = require('util');
 const auth = require('./authAsAdmin');
@@ -11,16 +11,20 @@ async function main() {
     const loginTicket = authClient.verifyIdToken({});
     console.log('username is', loginTicket.getUsername());
 
-    const orderService = new client.service.Order({
+    const actionService = new client.service.Action({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project: { id: 'cinerino' }
     });
-    const actions = await orderService.searchActionsByOrderNumber({
-        orderNumber: 'MO118-180913-000001',
-        sort: { startDate: client.factory.sortType.Ascending }
+    const searchActionsResult = await actionService.search({
+        limit: 10,
+        object: {
+            paymentMethod: { $eq: 'CreditCard' },
+            // paymentMethodId: { $eq: 'CIN430484008542883' }
+        }
     });
-    console.log(actions);
-    console.log(actions.map((a) => {
+    console.log(searchActionsResult);
+    console.log(searchActionsResult.data.map((a) => {
         return util.format(
             '@%s %s [%s] for [%s]',
             a.startDate,
