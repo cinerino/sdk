@@ -2153,10 +2153,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var PaymentMethodType;
 (function (PaymentMethodType) {
     /**
-     * 口座決済
-     */
-    PaymentMethodType["Account"] = "Account";
-    /**
      * 現金
      */
     PaymentMethodType["Cash"] = "Cash";
@@ -2266,10 +2262,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ProductType;
 (function (ProductType) {
     /**
-     * 口座
-     */
-    ProductType["Account"] = "Account";
-    /**
      * イベントサービス
      */
     ProductType["EventService"] = "EventService";
@@ -2281,7 +2273,6 @@ var ProductType;
      * ペイメントカード
      */
     ProductType["PaymentCard"] = "PaymentCard";
-    // PointCard = 'PointCard',
     /**
      * アドオン
      */
@@ -2353,7 +2344,6 @@ arguments[4][13][0].apply(exports,arguments)
 Object.defineProperty(exports, "__esModule", { value: true });
 var PaymentServiceType;
 (function (PaymentServiceType) {
-    PaymentServiceType["Account"] = "Account";
     PaymentServiceType["CreditCard"] = "CreditCard";
     PaymentServiceType["MovieTicket"] = "MovieTicket";
     PaymentServiceType["PaymentCard"] = "PaymentCard";
@@ -2529,7 +2519,7 @@ var TransactionType;
     TransactionType["CancelReservation"] = "CancelReservation";
     /**
      * 決済
-     * PaymentMethod: PaymentCard,Account,CreditCard,PaymentAgency...
+     * PaymentMethod: PaymentCard,CreditCard...
      */
     TransactionType["Pay"] = "Pay";
     /**
@@ -2538,7 +2528,7 @@ var TransactionType;
     TransactionType["Refund"] = "Refund";
     /**
      * サービス登録
-     * Service: MembershipService,PaymentCard,Account,MoneyTransfer...
+     * Service: MembershipService,PaymentCard...
      */
     TransactionType["RegisterService"] = "RegisterService";
 })(TransactionType || (TransactionType = {}));
@@ -5446,25 +5436,6 @@ var PaymentService = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     /**
-     * 口座決済承認
-     */
-    PaymentService.prototype.authorizeAccount = function (params) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.fetch({
-                        uri: "/payment/" + factory.chevre.product.ProductType.Account + "/authorize",
-                        method: 'POST',
-                        expectedStatusCodes: [http_status_1.CREATED],
-                        body: params
-                    })
-                        .then(function (response) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-                        return [2 /*return*/, response.json()];
-                    }); }); })];
-            });
-        });
-    };
-    /**
      * 汎用決済承認
      */
     PaymentService.prototype.authorizeAnyPayment = function (params) {
@@ -5518,6 +5489,17 @@ var PaymentService = /** @class */ (function (_super) {
                         .then(function (response) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
                         return [2 /*return*/, response.json()];
                     }); }); })];
+            });
+        });
+    };
+    /**
+     * 口座決済承認
+     * @deprecated Use authorizePaymentCard()
+     */
+    PaymentService.prototype.authorizeAccount = function (params) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.authorizePaymentCard(params)];
             });
         });
     };
@@ -5904,7 +5886,7 @@ var PersonService = /** @class */ (function (_super) {
     /**
      * ユーザー削除
      */
-    PersonService.prototype.deletById = function (params) {
+    PersonService.prototype.deleteById = function (params) {
         return __awaiter(this, void 0, void 0, function () {
             var id;
             return __generator(this, function (_a) {

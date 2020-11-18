@@ -49,7 +49,7 @@ async function main() {
     // 入金口座
     const toLocation = {
         typeOf: 'PrepaidPaymentCard',
-        identifier: '10000052027'
+        identifier: '139485855034733'
     };
 
     // 販売者検索

@@ -1,44 +1,48 @@
 /**
- * クレジットカード決済による注文プロセス
+ * ペイメントカード決済による注文プロセス
  */
 const moment = require('moment');
+const auth = require('../auth');
 const client = require('../../lib/index');
-
-const authClient = new client.auth.ClientCredentials({
-    domain: process.env.TEST_AUTHORIZE_SERVER_DOMAIN,
-    clientId: process.env.TEST_CLIENT_ID,
-    clientSecret: process.env.TEST_CLIENT_SECRET,
-    scopes: [],
-    state: ''
-});
 
 const projectId = 'cinerino';
 
-const eventService = new client.service.Event({
-    endpoint: process.env.API_ENDPOINT,
-    auth: authClient,
-    project: { id: projectId }
-});
-
-const sellerService = new client.service.Seller({
-    endpoint: process.env.API_ENDPOINT,
-    auth: authClient,
-    project: { id: projectId }
-});
-
-const placeOrderService = new client.service.txn.PlaceOrder({
-    endpoint: process.env.API_ENDPOINT,
-    auth: authClient,
-    project: { id: projectId }
-});
-
-const paymentService = new client.service.Payment({
-    endpoint: process.env.API_ENDPOINT,
-    auth: authClient,
-    project: { id: projectId }
-});
+const paymentCard = {
+    typeOf: 'PrepaidPaymentCard',
+    identifier: '139485855034733',
+    accessCode: '5821'
+};
 
 async function main() {
+    const authClient = await auth.login();
+    await authClient.refreshAccessToken();
+    const loginTicket = authClient.verifyIdToken({});
+    console.log('username is', loginTicket.getUsername());
+
+    const eventService = new client.service.Event({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient,
+        project: { id: projectId }
+    });
+
+    const sellerService = new client.service.Seller({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient,
+        project: { id: projectId }
+    });
+
+    const placeOrderService = new client.service.txn.PlaceOrder({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient,
+        project: { id: projectId }
+    });
+
+    const paymentService = new client.service.Payment({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient,
+        project: { id: projectId }
+    });
+
     // 販売劇場検索
     const searchSellersResult = await sellerService.search({});
     const seller = searchSellersResult.data[Math.floor(searchSellersResult.data.length * Math.random())];
@@ -136,26 +140,47 @@ async function main() {
             event: screeningEvent,
             seller: seller,
             transaction: transaction
-        });
+        })(eventService, placeOrderService);
         amount += authorizeSeatReservationResult.price;
         authorizeSeatReservationResults.push(authorizeSeatReservationResult);
     }
 
-    // クレジットカードオーソリアクション
+    // ペイメントカードオーソリアクション
     console.log('authorizing payment...');
-    let creditCardPaymentAuth = await paymentService.authorizePaymentCard({
+    let paymentAuth = await paymentService.authorizePaymentCard({
         object: {
-            typeOf: 'PrepaidPaymentCard',
+            typeOf: client.factory.action.authorize.paymentMethod.any.ResultType.Payment,
+            paymentMethod: 'PrepaidPaymentCard',
             amount: amount,
-            fromLocation: {
-                typeOf: 'GiftPaymentCard',
-                identifier: '10000053029',
-                accessCode: '123'
-            }
+            fromLocation: paymentCard
         },
         purpose: transaction
     });
-    console.log('payment authorized', creditCardPaymentAuth.id);
+    console.log('payment authorized', paymentAuth.id);
+
+    await wait(5000);
+    await paymentService.voidTransaction({
+        id: paymentAuth.id,
+        object: { typeOf: client.factory.chevre.service.paymentService.PaymentServiceType.PaymentCard },
+        purpose: transaction
+    });
+
+    await wait(5000);
+    console.log('authorizing payment...');
+    paymentAuth = await paymentService.authorizePaymentCard({
+        object: {
+            typeOf: client.factory.action.authorize.paymentMethod.any.ResultType.Payment,
+            paymentMethod: 'PrepaidPaymentCard',
+            amount: amount,
+            name: 'sample payment name',
+            description: 'sample payment description',
+            // notes: 'sample payment notes',
+            // fromAccount: { accountNumber: paymentCard.identifier },
+            fromLocation: paymentCard
+        },
+        purpose: transaction
+    });
+    console.log('payment authorized', paymentAuth.id);
 
     // 購入情報確認時間
     // tslint:disable-next-line:no-magic-numbers
@@ -286,112 +311,115 @@ async function main() {
     console.log('transaction confirmed', result.order.orderNumber);
 }
 
-async function authorizeSeatReservationByEvent(params) {
-    const screeningEvent = params.event;
-    const seller = params.seller;
-    const transaction = params.transaction;
+function authorizeSeatReservationByEvent(params) {
+    return async (eventService, placeOrderService) => {
 
-    // 券種検索
-    let ticketOffers = await eventService.searchTicketOffers({
-        event: { id: screeningEvent.id },
-        seller: { typeOf: seller.typeOf, id: seller.id },
-        store: { id: process.env.TEST_CLIENT_ID },
-    });
-    console.log('チケットオファーは以下の通りです')
-    console.log(ticketOffers.map((o) => {
-        const unitPriceSpecification = o.priceSpecification.priceComponent
-            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.UnitPriceSpecification)
-            .map((s) => `単価:${s.price}/${s.referenceQuantity.value}`).join(' ');
-        const videoFormatCharge = o.priceSpecification.priceComponent
-            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.VideoFormatChargeSpecification)
-            .map((s) => `+${s.appliesToVideoFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
-        const soundFormatCharge = o.priceSpecification.priceComponent
-            .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.SoundFormatChargeSpecification)
-            .map((s) => `+${s.appliesToSoundFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
-        return `${o.id} ${o.name.ja} ${unitPriceSpecification} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge}`
-    }).join('\n'));
+        const screeningEvent = params.event;
+        const seller = params.seller;
+        const transaction = params.transaction;
 
-    // 空席検索
-    const offers = await eventService.searchOffers({ event: screeningEvent });
-    console.log(offers.length, 'offers found');
-    const seatOffers = offers[0].containsPlace;
-    console.log(seatOffers.length, 'seatOffers found');
-    const availableSeatOffers = seatOffers.filter((o) => o.offers[0].availability === client.factory.chevre.itemAvailability.InStock);
-    console.log(availableSeatOffers.length, 'availableSeatOffers found');
-    if (availableSeatOffers.length <= 0) {
-        throw new Error('No available seats');
-    }
+        // 券種検索
+        let ticketOffers = await eventService.searchTicketOffers({
+            event: { id: screeningEvent.id },
+            seller: { typeOf: seller.typeOf, id: seller.id },
+            store: { id: process.env.TEST_CLIENT_ID },
+        });
+        console.log('チケットオファーは以下の通りです')
+        console.log(ticketOffers.map((o) => {
+            const unitPriceSpecification = o.priceSpecification.priceComponent
+                .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.UnitPriceSpecification)
+                .map((s) => `単価:${s.price}/${s.referenceQuantity.value}`).join(' ');
+            const videoFormatCharge = o.priceSpecification.priceComponent
+                .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.VideoFormatChargeSpecification)
+                .map((s) => `+${s.appliesToVideoFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
+            const soundFormatCharge = o.priceSpecification.priceComponent
+                .filter((s) => s.typeOf === client.factory.chevre.priceSpecificationType.SoundFormatChargeSpecification)
+                .map((s) => `+${s.appliesToSoundFormat}チャージ:${s.price} ${s.priceCurrency}`).join(' ')
+            return `${o.id} ${o.name.ja} ${unitPriceSpecification} ${o.priceCurrency} ${videoFormatCharge} ${soundFormatCharge}`
+        }).join('\n'));
 
-    // ムビチケ以外のオファーを選択
-    ticketOffers = ticketOffers.filter((offer) => {
-        const movieTicketTypeChargeSpecification = offer.priceSpecification.priceComponent.find(
-            (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
-        );
-        return movieTicketTypeChargeSpecification === undefined;
-    });
+        // 空席検索
+        const offers = await eventService.searchOffers({ event: screeningEvent });
+        console.log(offers.length, 'offers found');
+        const seatOffers = offers[0].containsPlace;
+        console.log(seatOffers.length, 'seatOffers found');
+        const availableSeatOffers = seatOffers.filter((o) => o.offers[0].availability === client.factory.chevre.itemAvailability.InStock);
+        console.log(availableSeatOffers.length, 'availableSeatOffers found');
+        if (availableSeatOffers.length <= 0) {
+            throw new Error('No available seats');
+        }
 
-    const selectedTicketOffer = ticketOffers.shift();
-    // const selectedTicketOffer = ticketOffers.find((o) => o.identifier === '1001');
-    console.log('ticket offer selected', selectedTicketOffer);
+        // ムビチケ以外のオファーを選択
+        ticketOffers = ticketOffers.filter((offer) => {
+            const movieTicketTypeChargeSpecification = offer.priceSpecification.priceComponent.find(
+                (component) => component.typeOf === client.factory.chevre.priceSpecificationType.MovieTicketTypeChargeSpecification
+            );
+            return movieTicketTypeChargeSpecification === undefined;
+        });
 
-    // 座席をランダムに選択
-    const selectedScreeningRoomSection = offers[0].branchCode;
-    console.log('screening room section selected', selectedScreeningRoomSection);
-    console.log(selectedScreeningRoomSection);
-    // const selectedSeatOffer = availableSeatOffers[Math.floor(availableSeatOffers.length * Math.random())];
-    const selectedSeatOffers = availableSeatOffers.slice(0, 3);
-    console.log(selectedSeatOffers.length, 'seats selected');
+        const selectedTicketOffer = ticketOffers.shift();
+        // const selectedTicketOffer = ticketOffers.find((o) => o.identifier === '1001');
+        console.log('ticket offer selected', selectedTicketOffer);
+
+        // 座席をランダムに選択
+        const selectedScreeningRoomSection = offers[0].branchCode;
+        console.log('screening room section selected', selectedScreeningRoomSection);
+        console.log(selectedScreeningRoomSection);
+        // const selectedSeatOffer = availableSeatOffers[Math.floor(availableSeatOffers.length * Math.random())];
+        const selectedSeatOffers = availableSeatOffers.slice(0, 3);
+        console.log(selectedSeatOffers.length, 'seats selected');
 
 
-    // アドオン選択
-    let acceptedAddOns = [];
-    if (Array.isArray(selectedTicketOffer.addOn) && selectedTicketOffer.addOn.length > 0) {
-        acceptedAddOns = [{ id: selectedTicketOffer.addOn[0].id }];
-    }
-    console.log('addOn selected.', acceptedAddOns);
+        // アドオン選択
+        let acceptedAddOns = [];
+        if (Array.isArray(selectedTicketOffer.addOn) && selectedTicketOffer.addOn.length > 0) {
+            acceptedAddOns = [{ id: selectedTicketOffer.addOn[0].id }];
+        }
+        console.log('addOn selected.', acceptedAddOns);
 
-    await wait(5000);
-    console.log('authorizing seat reservation...');
-    let seatReservationAuth = await placeOrderService.authorizeSeatReservation({
-        object: {
-            event: {
-                id: screeningEvent.id
+        await wait(5000);
+        console.log('authorizing seat reservation...');
+        let seatReservationAuth = await placeOrderService.authorizeSeatReservation({
+            object: {
+                event: {
+                    id: screeningEvent.id
+                },
+                acceptedOffer: selectedSeatOffers.map((o) => {
+                    return {
+                        id: selectedTicketOffer.id,
+                        ticketedSeat: {
+                            seatNumber: o.branchCode,
+                            seatSection: selectedScreeningRoomSection
+                        },
+                        addOn: acceptedAddOns
+                    };
+                }),
+                notes: 'test from samples',
+                // onReservationStatusChanged: {
+                //     informReservation: [
+                //         { recipient: { url: informUrl } }
+                //     ],
+                // }
             },
-            acceptedOffer: selectedSeatOffers.map((o) => {
-                return {
-                    id: selectedTicketOffer.id,
-                    ticketedSeat: {
-                        seatNumber: o.branchCode,
-                        seatSection: selectedScreeningRoomSection
-                    },
-                    addOn: acceptedAddOns
-                };
-            }),
-            notes: 'test from samples',
-            // onReservationStatusChanged: {
-            //     informReservation: [
-            //         { recipient: { url: informUrl } }
-            //     ],
-            // }
-        },
-        purpose: transaction
-    });
-    console.log('seat reservation authorized', seatReservationAuth.id);
+            purpose: transaction
+        });
+        console.log('seat reservation authorized', seatReservationAuth.id);
 
-    // await wait(5000);
-    // console.log('voiding seat reservation auth...');
-    // await placeOrderService.voidSeatReservation({ transactionId: transaction.id, actionId: seatReservationAuth.id });
-    // console.log('seat reservation auth voided');
+        // await wait(5000);
+        // console.log('voiding seat reservation auth...');
+        // await placeOrderService.voidSeatReservation({ transactionId: transaction.id, actionId: seatReservationAuth.id });
+        // console.log('seat reservation auth voided');
 
-    // 金額計算
-    if (seatReservationAuth.result === undefined) {
-        throw new Error('座席予約承認結果は必ず存在します');
+        // 金額計算
+        if (seatReservationAuth.result === undefined) {
+            throw new Error('座席予約承認結果は必ず存在します');
+        }
+
+        const amount = seatReservationAuth.result.price;
+        console.log('金額は', amount);
+
+        return seatReservationAuth.result;
     }
-
-    const amount = seatReservationAuth.result.price;
-    console.log('金額は', amount);
-
-    return seatReservationAuth.result;
 }
 
 async function wait(waitInMilliseconds) {
