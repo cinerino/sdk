@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- update @cinerino/factory
+- Account決済をPaymentCard決済に統合
+- sskts専用メンバーシップ登録時に、agent.additionalPropertyを指定できるように調整
+
 ### Deprecated
 
 ### Removed
