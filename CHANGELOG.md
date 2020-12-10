@@ -18,6 +18,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.18.0 - 2020-12-10
+
+### Removed
+
+- 注文に対する所有権コード発行サービスを削除
+- トークンでの予約照会サービス(非推奨)を削除
+
 ## v1.17.0 - 2020-11-18
 
 ### Changed
