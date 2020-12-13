@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.18.1 - 2020-12-13
+
+### Changed
+
+- update @cinerino/factory
+
 ## v1.18.0 - 2020-12-10
 
 ### Removed
