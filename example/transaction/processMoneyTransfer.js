@@ -33,16 +33,24 @@ async function main() {
         project: { id: projectId }
     });
 
-    const amount = 1;
+    const amount = {
+        value: 1,
+        currency: 'JPY'
+    };
 
+    // let fromLocation = {
+    //     typeOf: 'PrepaidPaymentCard',
+    //     identifier: '10000052027',
+    //     accessCode: '123'
+    // };
     let fromLocation = {
-        typeOf: 'PrepaidPaymentCard',
-        identifier: '10000052027',
-        accessCode: '123'
+        typeOf: 'Order',
+        orderNumber: 'CIN6-4801622-4723084',
+        confirmationNumber: '1741'
     };
     const toLocation = {
         typeOf: 'PrepaidPaymentCard',
-        identifier: '40700100025'
+        identifier: '864912122869377'
     };
 
     const agent = {
@@ -51,7 +59,6 @@ async function main() {
     };
     const recipient = {
         typeOf: client.factory.personType.Person,
-        id: 'Sample Recipient ID',
         name: 'Sample Recipient Name'
     };
 
@@ -78,10 +85,11 @@ async function main() {
             amount: amount,
             fromLocation: fromLocation,
             toLocation: toLocation,
-            description: `Money Transfer Transaction Sample ${moment().toISOString()}`,
-            authorizeActions: []
+            description: `サンプル取引 ${moment().toISOString()}`
         },
-        expires: moment().add(1, 'minutes').toDate(),
+        expires: moment()
+            .add(1, 'minutes')
+            .toDate(),
     });
     console.log('transaction started', transaction.id);
 

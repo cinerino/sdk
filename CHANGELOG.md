@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
+- 注文トークンによる口座開設サービスを追加
+
 ### Changed
 
 ### Deprecated
