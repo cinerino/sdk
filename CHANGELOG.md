@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- 予約使用サービスをステータス:OKに対応
+
 ### Deprecated
 
 ### Removed
