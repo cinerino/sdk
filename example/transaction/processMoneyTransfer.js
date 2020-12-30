@@ -35,22 +35,17 @@ async function main() {
 
     const amount = {
         value: 1,
-        currency: 'JPY'
+        currency: 'Point'
     };
 
-    // let fromLocation = {
-    //     typeOf: 'PrepaidPaymentCard',
-    //     identifier: '10000052027',
-    //     accessCode: '123'
-    // };
     let fromLocation = {
         typeOf: 'Order',
         orderNumber: 'CIN6-4801622-4723084',
         confirmationNumber: '1741'
     };
     const toLocation = {
-        typeOf: 'PrepaidPaymentCard',
-        identifier: '864912122869377'
+        typeOf: 'Account',
+        identifier: '581796225676618'
     };
 
     const agent = {
@@ -66,15 +61,7 @@ async function main() {
     const searchSellersResult = await sellerService.search({});
     const seller = searchSellersResult.data.shift();
 
-    // // 口座にコード発行
-    // const { code } = await personOwnershipInfoService.authorize({
-    //     ownershipInfoId: accountOwnershipInfo.id
-    // });
-    // // 口座所有権をトークン化
-    // const { token } = await ownershipInfoService.getToken({ code });
-    // fromLocation = token;
-
-    // トークンを使用して口座オーソリアクション
+    // 取引開始
     console.log('starting transaction...');
     const transaction = await moneyTransferService.start({
         typeOf: client.factory.transactionType.MoneyTransfer,
@@ -104,11 +91,21 @@ async function main() {
     });
     await wait(1000);
 
-    console.log('confirming transaction...');
-    await moneyTransferService.confirm({
-        id: transaction.id
-    });
-    console.log('transaction confirmed');
+    try {
+        console.log('confirming transaction...');
+        await moneyTransferService.confirm({
+            id: transaction.id
+        });
+        console.log('transaction confirmed');
+    } catch (error) {
+        console.log('canceling transaction...');
+        await moneyTransferService.cancel({
+            id: transaction.id
+        });
+        console.log('transaction canceled');
+
+        throw error;
+    }
 }
 
 async function wait(waitInMilliseconds) {

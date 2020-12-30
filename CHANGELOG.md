@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.19.1 - 2020-12-30
+
+### Changed
+
+- 予約使用サービスをステータス:OKに対応
+
 ## v1.19.0 - 2020-12-22
 
 ### Added
