@@ -2275,6 +2275,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var PlaceType;
 (function (PlaceType) {
+    PlaceType["AggregatePlace"] = "AggregatePlace";
     PlaceType["MovieTheater"] = "MovieTheater";
     PlaceType["Place"] = "Place";
     PlaceType["ScreeningRoom"] = "ScreeningRoom";
@@ -6763,6 +6764,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReservationService = void 0;
 var http_status_1 = require("http-status");
+var factory = require("../factory");
 var service_1 = require("../service");
 /**
  * 予約サービス
@@ -6876,6 +6878,26 @@ var ReservationService = /** @class */ (function (_super) {
         });
     };
     /**
+     * 予約使用アクション取消
+     */
+    ReservationService.prototype.cancelUseAction = function (params) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.fetch({
+                            uri: "/reservations/" + String(params.object.id) + "/actions/use/" + String(params.id) + "/" + factory.actionStatusType.CanceledActionStatus,
+                            method: 'PUT',
+                            body: params,
+                            expectedStatusCodes: [http_status_1.NO_CONTENT]
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /**
      * 予約取消
      */
     ReservationService.prototype.cancel = function (params) {
@@ -6939,7 +6961,7 @@ var ReservationService = /** @class */ (function (_super) {
 }(service_1.Service));
 exports.ReservationService = ReservationService;
 
-},{"../service":115,"http-status":278}],136:[function(require,module,exports){
+},{"../factory":113,"../service":115,"http-status":278}],136:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
