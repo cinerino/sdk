@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- 予約検索をtotalCountに対応
+
 ### Deprecated
 
 ### Removed
