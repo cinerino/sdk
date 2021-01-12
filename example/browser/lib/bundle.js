@@ -6792,7 +6792,11 @@ var ReservationService = /** @class */ (function (_super) {
                         return __generator(this, function (_b) {
                             switch (_b.label) {
                                 case 0:
-                                    _a = {};
+                                    _a = {
+                                        totalCount: (typeof response.headers.get('X-Total-Count') === 'string')
+                                            ? Number(response.headers.get('X-Total-Count'))
+                                            : undefined
+                                    };
                                     return [4 /*yield*/, response.json()];
                                 case 1: return [2 /*return*/, (_a.data = _b.sent(),
                                         _a)];
