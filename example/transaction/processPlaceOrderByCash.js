@@ -5,6 +5,8 @@ const moment = require('moment');
 const auth = require('../authAsAdmin');
 const client = require('../../lib/index');
 
+const project = { id: 'cinerino' };
+
 async function main() {
     const authClient = await auth.login();
     await authClient.refreshAccessToken();
@@ -13,27 +15,38 @@ async function main() {
 
     const eventService = new client.service.Event({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project
     });
     const sellerService = new client.service.Seller({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project
     });
     const placeOrderService = new client.service.txn.PlaceOrder({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project
     });
     const personService = new client.service.Person({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project
     });
     const orderService = new client.service.Order({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project
     });
     const deliveryService = new client.service.Delivery({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project
+    });
+    const paymentService = new client.service.Payment({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient,
+        project
     });
 
     console.log('finding profile...');
@@ -54,7 +67,7 @@ async function main() {
         // superEventLocationIdentifiers: [seller.identifier],
         inSessionFrom: moment().toDate(),
         inSessionThrough: moment().add(1, 'week').toDate(),
-        superEvent: { locationBranchCodes: [seller.location.branchCode] }
+        superEvent: { locationBranchCodes: ['118'] }
     });
     console.log(searchScreeningEventsResult.totalCount, 'events found');
 
@@ -140,6 +153,14 @@ async function main() {
         );
         return movieTicketTypeChargeSpecification === undefined;
     });
+    // 0円オファーを選択
+    // ticketOffers = ticketOffers.filter((offer) => {
+    //     const unitPriceSpec = offer.priceSpecification.priceComponent.find(
+    //         (component) => component.typeOf === client.factory.chevre.priceSpecificationType.UnitPriceSpecification
+    //     );
+    //     return unitPriceSpec.price === 0;
+    // });
+
     const selectedTicketOffer = ticketOffers.shift();
     console.log('ticket offer selected', selectedTicketOffer.id);
 
@@ -181,32 +202,34 @@ async function main() {
     console.log('金額は', amount);
 
     console.log('authorizing any payment...');
-    let anyPaymentAuth = await placeOrderService.authorizeAnyPayment({
+    let anyPaymentAuth = await paymentService.authorizeAnyPayment({
         object: {
-            typeOf: client.factory.paymentMethodType.Cash,
+            typeOf: client.factory.action.authorize.paymentMethod.any.ResultType.Payment,
+            paymentMethod: client.factory.paymentMethodType.Cash,
             amount: amount,
-            additionalProperty: [{ name: 'useCoin', value: false }]
+            additionalProperty: [{ name: 'useCoin', value: '0' }]
         },
         purpose: transaction
     });
     console.log('any payment authorized', anyPaymentAuth.id);
 
-    await wait(5000);
+    // await wait(5000);
 
-    console.log('voiding any auth...');
-    await placeOrderService.voidAnyPayment(anyPaymentAuth);
-    console.log('any auth voided');
+    // console.log('voiding any auth...');
+    // await paymentService.voidAnyPayment(anyPaymentAuth);
+    // console.log('any auth voided');
 
-    console.log('authorizing any payment...');
-    anyPaymentAuth = await placeOrderService.authorizeAnyPayment({
-        object: {
-            typeOf: client.factory.paymentMethodType.Cash,
-            amount: amount,
-            additionalProperty: [{ name: 'useCoin', value: false }]
-        },
-        purpose: transaction
-    });
-    console.log('any authorized', anyPaymentAuth.id);
+    // console.log('authorizing any payment...');
+    // anyPaymentAuth = await paymentService.authorizeAnyPayment({
+    //     object: {
+    //         typeOf: client.factory.action.authorize.paymentMethod.any.ResultType.Payment,
+    //         paymentMethod: client.factory.paymentMethodType.Cash,
+    //         amount: amount,
+    //         additionalProperty: [{ name: 'useCoin', value: '0' }]
+    //     },
+    //     purpose: transaction
+    // });
+    // console.log('any authorized', anyPaymentAuth.id);
 
     // 購入者情報入力時間
     // tslint:disable-next-line:no-magic-numbers
