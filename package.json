@@ -93,7 +93,7 @@
     "watchify": "^3.11.1"
   },
   "dependencies": {
-    "@cinerino/api-abstract-client": "1.23.4",
+    "@cinerino/api-abstract-client": "1.23.5",
     "debug": "^3.2.6",
     "http-status": "^1.4.2",
     "idtoken-verifier": "^2.0.3",
