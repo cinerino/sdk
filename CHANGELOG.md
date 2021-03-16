@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- 汎用決済サービスを対面決済サービスとして再定義
+- 注文照会結果の型を配列に統一
+
 ### Deprecated
 
 ### Removed

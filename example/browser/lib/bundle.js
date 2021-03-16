@@ -5464,14 +5464,14 @@ var PaymentService = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     /**
-     * 汎用決済承認
+     * 対面決済承認
      */
     PaymentService.prototype.authorizeAnyPayment = function (params) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, this.fetch({
-                        uri: "/payment/any/authorize",
+                        uri: "/payment/" + factory.chevre.service.paymentService.PaymentServiceType.FaceToFace + "/authorize",
                         method: 'POST',
                         expectedStatusCodes: [http_status_1.CREATED],
                         body: params
@@ -5589,16 +5589,17 @@ var PaymentService = /** @class */ (function (_super) {
         });
     };
     /**
-     * 汎用決済承認取消
+     * 対面決済承認取消
      */
     PaymentService.prototype.voidAnyPayment = function (params) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.fetch({
-                            uri: "/payment/any/authorize/" + params.id + "/void",
+                            uri: "/payment/" + factory.chevre.service.paymentService.PaymentServiceType.FaceToFace + "/authorize/" + params.id + "/void",
                             method: 'PUT',
-                            expectedStatusCodes: [http_status_1.NO_CONTENT]
+                            expectedStatusCodes: [http_status_1.NO_CONTENT],
+                            body: params
                         })];
                     case 1:
                         _a.sent();
