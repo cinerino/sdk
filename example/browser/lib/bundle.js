@@ -4190,16 +4190,17 @@ var DeliveryService = /** @class */ (function (_super) {
      * すでに配送済の場合、何もしません。
      */
     DeliveryService.prototype.sendOrder = function (params) {
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0: return [4 /*yield*/, this.fetch({
-                            uri: "/orders/" + params.orderNumber + "/deliver",
+                            uri: "/orders/" + ((_a = params.object) === null || _a === void 0 ? void 0 : _a.orderNumber) + "/deliver",
                             method: 'POST',
                             expectedStatusCodes: [http_status_1.NO_CONTENT]
                         })];
                     case 1:
-                        _a.sent();
+                        _b.sent();
                         return [2 /*return*/];
                 }
             });
