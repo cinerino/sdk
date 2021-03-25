@@ -24,9 +24,7 @@ const creditCard = {
 
 // ポイント特典付与口座
 const pointAwardAccount = {
-    accountNumber: '029387028110812'
-    // accountNumber: '1604362599987'
-
+    accountNumber: '139458017738823'
 }
 
 // 購入者プロフィール
@@ -73,7 +71,8 @@ async function main() {
 
     const personService = new client.service.Person({
         endpoint: process.env.API_ENDPOINT,
-        auth: authClient
+        auth: authClient,
+        project: { id: projectId }
     });
 
     console.log('finding profile...');
@@ -92,6 +91,9 @@ async function main() {
     const { data } = await productService.search({
         typeOf: { $eq: client.factory.chevre.product.ProductType.MembershipService }
     });
+    if (data.length === 0) {
+        throw new Error('no membership products');
+    }
     const product = data.shift();
     console.log('ordering product...', product.name.ja);
 
@@ -101,6 +103,9 @@ async function main() {
         seller: { id: seller.id }
     });
     console.log(availableOffers.length, 'offers available');
+    if (availableOffers.length === 0) {
+        throw new Error('no available offers');
+    }
     const acceptedOffer = availableOffers[0];
     console.log('offer selected', acceptedOffer.name.ja, acceptedOffer.priceSpecification.priceComponent[0].price);
 
@@ -109,18 +114,14 @@ async function main() {
         expires: moment()
             .add(30, 'seconds')
             .toDate(),
-        agent: {},
-        seller: {
-            typeOf: seller.typeOf,
-            id: seller.id
-        },
+        seller: { typeOf: seller.typeOf, id: seller.id },
         object: {
             // passport: { token: passportToken }
         }
     });
     console.log('transaction started', transaction.id);
 
-    // 適当に電話番号下4桁
+    // 電話番号下4桁
     const accessCode = profile.telephone.slice(-4);
 
     let productOfferAuthorization = await offerService.authorizeProduct({
@@ -139,12 +140,10 @@ async function main() {
                 pointAward: {
                     typeOf: client.factory.chevre.actionType.MoneyTransfer,
                     toLocation: { identifier: pointAwardAccount.accountNumber },
-                    ...{
-                        recipient: {
-                            id: transaction.agent.id,
-                            name: `${profile.givenName} ${profile.familyName}`,
-                            typeOf: transaction.agent.typeOf
-                        }
+                    recipient: {
+                        id: transaction.agent.id,
+                        name: `${profile.givenName} ${profile.familyName}`,
+                        typeOf: transaction.agent.typeOf
                     }
                 }
             }
@@ -155,11 +154,12 @@ async function main() {
 
     // クレジットカード決済承認
     console.log('authorizing credit card payment...');
+    const amount = acceptedOffer.priceSpecification.priceComponent[0].price;
     let creditCardPaymentAuth = await paymentService.authorizeCreditCard({
         object: {
             typeOf: client.factory.action.authorize.paymentMethod.any.ResultType.Payment,
             paymentMethod: client.factory.paymentMethodType.CreditCard,
-            amount: acceptedOffer.priceSpecification.priceComponent[0].price,
+            amount,
             method: '1',
             creditCard: creditCard
         },
@@ -188,7 +188,7 @@ async function main() {
         sender: {
             name: `♥ ${seller.name.ja} ♥`
         },
-        about: `♥♥♥ ${profile.name}さんへメンバーシップ発行のお知らせ ♥♥♥`
+        about: `♥♥♥ ${profile.givenName}さんへメンバーシップ発行のお知らせ ♥♥♥`
     };
 
     let result = await placeOrderService.confirm({
@@ -199,9 +199,7 @@ async function main() {
                     sendOrder: {
                         potentialActions: {
                             sendEmailMessage: [
-                                {
-                                    object: email
-                                }
+                                { object: email }
                             ]
                         }
                     }
@@ -216,8 +214,10 @@ async function wait(waitInMilliseconds) {
     return new Promise((resolve) => setTimeout(resolve, waitInMilliseconds));
 }
 
-main().then(() => {
-    console.log('success!');
-}).catch(console.error);
+main()
+    .then(() => {
+        console.log('success!');
+    })
+    .catch(console.error);
 
 exports.main = main;
