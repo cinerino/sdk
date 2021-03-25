@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v1.23.0 - 2021-03-25
+
+### Changed
+
+- 注文配送を拡張
+
 ## v1.22.0 - 2021-03-25
 
 ### Added
