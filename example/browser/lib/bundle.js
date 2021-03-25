@@ -4197,6 +4197,7 @@ var DeliveryService = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, this.fetch({
                             uri: "/orders/" + ((_a = params.object) === null || _a === void 0 ? void 0 : _a.orderNumber) + "/deliver",
                             method: 'POST',
+                            body: params,
                             expectedStatusCodes: [http_status_1.NO_CONTENT]
                         })];
                     case 1:
