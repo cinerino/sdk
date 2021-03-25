@@ -8,19 +8,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-- 注文番号と電話番号による注文照会サービスを追加
-
 ### Changed
 
 ### Deprecated
 
 ### Removed
 
-- sskts専用メンバーシップ登録サービスを削除
-
 ### Fixed
 
 ### Security
+
+## v1.22.0 - 2021-03-25
+
+### Added
+
+- 注文番号と電話番号による注文照会サービスを追加
+
+### Removed
+
+- sskts専用メンバーシップ登録サービスを削除
 
 ## v1.21.1 - 2021-03-17
 
