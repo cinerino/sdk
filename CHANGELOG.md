@@ -10,9 +10,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
-- update @cinerino/factory
-
 ### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## v2.0.0 - 2021-04-13
+
+### Changed
+
+- update @cinerino/factory
 
 ### Removed
 
@@ -22,10 +32,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - 非推奨の予約発券を削除
 - 非推奨の予約入場を削除
 - 非推奨の所有権トークン取得を削除
-
-### Fixed
-
-### Security
 
 ## v1.23.1 - 2021-03-25
 
