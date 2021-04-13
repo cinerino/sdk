@@ -10,9 +10,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- update @cinerino/factory
+
 ### Deprecated
 
 ### Removed
+
+- 予約使用アクション取消を削除
+- インボイス検索を削除
+- 決済方法検索を削除
+- 非推奨の予約発券を削除
+- 非推奨の予約入場を削除
+- 非推奨の所有権トークン取得を削除
 
 ### Fixed
 
