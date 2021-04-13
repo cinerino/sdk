@@ -18,6 +18,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v2.0.0 - 2021-04-13
+
+### Changed
+
+- update @cinerino/factory
+
+### Removed
+
+- 予約使用アクション取消を削除
+- インボイス検索を削除
+- 決済方法検索を削除
+- 非推奨の予約発券を削除
+- 非推奨の予約入場を削除
+- 非推奨の所有権トークン取得を削除
+
 ## v1.23.1 - 2021-03-25
 
 ### Changed
