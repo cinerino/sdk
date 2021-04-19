@@ -18,6 +18,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v2.1.0 - 2021-04-19
+
+### Added
+
+- 顧客サービスを追加
+
+### Changed
+
+- 注文取引に顧客を指定できるように調整
+
 ## v2.0.0 - 2021-04-13
 
 ### Changed
