@@ -23,6 +23,11 @@ async function main() {
         auth: authClient,
         project
     });
+    const customerService = new client.service.Customer({
+        endpoint: process.env.API_ENDPOINT,
+        auth: authClient,
+        project
+    });
     const placeOrderService = new client.service.txn.PlaceOrder({
         endpoint: process.env.API_ENDPOINT,
         auth: authClient,
@@ -60,6 +65,10 @@ async function main() {
         throw new Error('No seller');
     }
     console.log('ordering from seller...', seller.name.ja);
+
+    // 顧客検索
+    const searchCustomerResult = await customerService.search({});
+    const customer = searchCustomerResult.data[Math.floor(searchCustomerResult.data.length * Math.random())];
 
     // イベント検索
     const searchScreeningEventsResult = await eventService.search({
@@ -110,6 +119,10 @@ async function main() {
             id: seller.id
         },
         object: {
+            // 顧客指定の場合↓
+            ...(customer !== undefined)
+                ? { customer: { id: customer.id } }
+                : undefined
             // passport: { token: passportToken }
         }
     });
@@ -136,9 +149,11 @@ async function main() {
     }).join('\n'));
 
     // 空席検索
-    const offers = await eventService.searchOffers({ event: screeningEvent });
+    const searchSeatsResult = await eventService.searchSeats({ event: { id: screeningEvent.id }, limit: 100, page: 1 });
+    const offers = searchSeatsResult.data;
     console.log(offers.length, 'offers found');
-    const seatOffers = offers[0].containsPlace;
+    // const seatOffers = offers[0].containsPlace;
+    const seatOffers = searchSeatsResult.data;
     console.log(seatOffers.length, 'seatOffers found');
     const availableSeatOffers = seatOffers.filter((o) => o.offers[0].availability === client.factory.chevre.itemAvailability.InStock);
     console.log(availableSeatOffers.length, 'availableSeatOffers found');
@@ -165,12 +180,12 @@ async function main() {
     console.log('ticket offer selected', selectedTicketOffer.id);
 
     // 座席をランダムに選択
-    const selectedScreeningRoomSection = offers[0].branchCode;
-    console.log('screening room section selected', selectedScreeningRoomSection);
-    console.log(selectedScreeningRoomSection);
+    // const selectedScreeningRoomSection = offers[0].branchCode;
+    // console.log('screening room section selected', selectedScreeningRoomSection);
+    // console.log(selectedScreeningRoomSection);
     const selectedSeatOffers = availableSeatOffers.slice(0, 1);
     // const selectedSeatOffers = availableSeatOffers.slice(0, 50);
-    console.log('seat selected', selectedSeatOffers.map((o) => o.branchCode));
+    console.log('seat selected', selectedSeatOffers.map((o) => `${o.containedInPlace.branchCode} ${o.branchCode}`));
 
     await wait(5000);
     console.log('authorizing seat reservation...');
@@ -182,9 +197,15 @@ async function main() {
             acceptedOffer: selectedSeatOffers.map((o) => {
                 return {
                     id: selectedTicketOffer.id,
-                    ticketedSeat: {
-                        seatNumber: o.branchCode,
-                        seatSection: selectedScreeningRoomSection
+                    itemOffered: {
+                        serviceOutput: {
+                            reservedTicket: {
+                                ticketedSeat: {
+                                    seatNumber: o.branchCode,
+                                    seatSection: o.containedInPlace.branchCode
+                                }
+                            }
+                        }
                     }
                 }
             }),

@@ -8,7 +8,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
+- 顧客サービスを追加
+
 ### Changed
+
+- 注文取引に顧客を指定できるように調整
 
 ### Deprecated
 
