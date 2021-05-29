@@ -18,6 +18,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v3.0.0 - 2021-05-29
+
+### Changed
+
+- @chevre/factoryで再構築
+
+### Removed
+
+- タスクサービスを削除
+- ユーザープールサービスを削除
+- プロジェクト編集を削除
+- IAMメンバー編集を削除
+- 承認サービスを削除
+
 ## v2.1.0 - 2021-04-19
 
 ### Added
