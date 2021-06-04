@@ -18,6 +18,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v3.1.0 - 2021-06-04
+
+### Changed
+
+- update @chevre/factory
+
+### Removed
+
+- 印刷アクション関連サービスを削除
+
 ## v3.0.0 - 2021-05-29
 
 ### Changed
