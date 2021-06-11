@@ -10,17 +10,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
-- update @chevre/factory
-
 ### Deprecated
 
 ### Removed
 
-- イベント部分更新を削除
-
 ### Fixed
 
 ### Security
+
+## v3.2.0 - 2021-06-11
+
+### Changed
+
+- update @chevre/factory
+
+### Removed
+
+- イベント部分更新を削除
 
 ## v3.1.0 - 2021-06-04
 
