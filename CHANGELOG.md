@@ -8,8 +8,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-- @chevre/api-nodejs-clientからChevreサービスを移行
-
 ### Changed
 
 ### Deprecated
@@ -19,6 +17,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v3.3.0 - 2021-06-16
+
+### Added
+
+- @chevre/api-nodejs-clientからChevreサービスを移行
 
 ## v3.2.0 - 2021-06-11
 
