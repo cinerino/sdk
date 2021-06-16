@@ -1,11 +1,12 @@
 /**
  * API Node.js Client
  */
-import { factory, service, transporters } from './abstract';
+import { chevre, factory, service, transporters } from './abstract';
 import ClientCredentialsClient from './auth/clientCredentialsClient';
 import { ImplicitGrantClient, IOptions as IImplicitGrantClientOptions } from './auth/implicitGrantClient';
 import OAuth2client from './auth/oAuth2client';
 
+export import chevre = chevre;
 /**
  * factory
  */
