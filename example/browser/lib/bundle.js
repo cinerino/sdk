@@ -2190,13 +2190,18 @@ exports.CategorySetIdentifier = void 0;
 var CategorySetIdentifier;
 (function (CategorySetIdentifier) {
     /**
-     * 口座タイプ
+     * 通貨区分
+     * @deprecated Use CurrencyType
      */
     CategorySetIdentifier["AccountType"] = "AccountType";
     /**
      * レーティングタイプ
      */
     CategorySetIdentifier["ContentRatingType"] = "ContentRatingType";
+    /**
+     * 通貨区分
+     */
+    CategorySetIdentifier["CurrencyType"] = "CurrencyType";
     /**
      * 配給区分
      */
