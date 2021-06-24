@@ -1,6 +1,6 @@
 {
   "name": "@cinerino/sdk",
-  "version": "3.5.1",
+  "version": "3.6.0",
   "description": "Cinerino SDK",
   "main": "./lib/index.js",
   "browser": {
@@ -93,7 +93,7 @@
     "watchify": "^3.11.1"
   },
   "dependencies": {
-    "@cinerino/api-abstract-client": "3.5.1",
+    "@cinerino/api-abstract-client": "3.6.0",
     "debug": "^3.2.6",
     "http-status": "^1.4.2",
     "idtoken-verifier": "^2.0.3",
