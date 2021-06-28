@@ -110,19 +110,25 @@ async function main() {
     const accessCode = profile.telephone.slice(-4);
 
     let productOfferAuthorization = await offerService.authorizeProduct({
-        object: {
+        object: [{
+            project: product.project,
             typeOf: acceptedOffer.typeOf,
             id: acceptedOffer.id,
             itemOffered: {
+                project: product.project,
                 typeOf: product.typeOf,
                 id: product.id,
                 serviceOutput: {
+                    project: product.project,
+                    typeOf: String(product.serviceOutput.typeOf),
                     accessCode: accessCode,
                     name: product.name.ja
                     // additionalProperty: [{ name: 'sampleName', value: 'sampleValue' }]
                 }
-            }
-        },
+            },
+            priceCurrency: client.factory.priceCurrency.JPY,
+            seller: { project: seller.project, typeOf: seller.typeOf, id: seller.id }
+        }],
         purpose: { typeOf: transaction.typeOf, id: transaction.id }
     });
     console.log('product offer authorized. id:', productOfferAuthorization.id);
