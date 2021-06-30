@@ -372,24 +372,29 @@ async function authorizeSeatReservationByEvent(params) {
     console.log('authorizing seat reservation...');
     let seatReservationAuth = await placeOrderService.authorizeSeatReservation({
         object: {
-            event: {
+            reservationFor: {
                 id: screeningEvent.id
             },
             acceptedOffer: selectedSeatOffers.map((o) => {
                 return {
+                    typeOf: selectedTicketOffer.typeOf,
                     id: selectedTicketOffer.id,
                     // addOn: acceptedAddOns,
                     itemOffered: {
                         serviceOutput: {
+                            typeOf: client.factory.reservationType.EventReservation,
                             reservedTicket: {
+                                typeOf: 'Ticket',
                                 ticketedSeat: {
+                                    typeOf: client.factory.placeType.Seat,
                                     seatNumber: o.branchCode,
-                                    seatSection: selectedScreeningRoomSection
+                                    seatSection: selectedScreeningRoomSection,
+                                    seatRow: ''
                                 },
                             },
                             additionalProperty: [{ name: 'sampleName', value: 'sampleValue' }],
                             programMembershipUsed: {
-                                identifier: '139215751228243',
+                                identifier: '581637641267608',
                                 accessCode: '5678'
                             }
                         }
