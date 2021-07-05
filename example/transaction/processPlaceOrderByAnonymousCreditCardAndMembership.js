@@ -393,10 +393,11 @@ async function authorizeSeatReservationByEvent(params) {
                                 },
                             },
                             additionalProperty: [{ name: 'sampleName', value: 'sampleValue' }],
-                            programMembershipUsed: {
-                                identifier: '581637641267608',
-                                accessCode: '5678'
-                            }
+                            // programMembershipUsed: {
+                            //     identifier: '581637641267608',
+                            //     accessCode: '5678'
+                            // },
+                            programMembershipUsed: 'xxxxx'
                         }
                     },
                     additionalProperty: [{ name: 'sampleName', value: 'sampleValue' }],
