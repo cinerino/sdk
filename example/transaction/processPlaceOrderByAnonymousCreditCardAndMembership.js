@@ -393,10 +393,7 @@ async function authorizeSeatReservationByEvent(params) {
                                 },
                             },
                             additionalProperty: [{ name: 'sampleName', value: 'sampleValue' }],
-                            // programMembershipUsed: {
-                            //     identifier: '581637641267608',
-                            //     accessCode: '5678'
-                            // },
+                            // トークン化されたメンバーシップを指定
                             programMembershipUsed: 'xxxxx'
                         }
                     },
