@@ -18,6 +18,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v3.9.0 - 2021-07-09
+
+### Added
+
+- マイメンバーシップ検索を追加
+- マイ予約検索を追加
+
 ## v3.8.2 - 2021-07-08
 
 ### Changed

@@ -12706,6 +12706,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12745,6 +12756,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersonOwnershipInfoService = void 0;
 var http_status_1 = require("http-status");
+var factory = require("../../factory");
 var service_1 = require("../../service");
 /**
  * ユーザー所有権サービス
@@ -12896,6 +12908,70 @@ var PersonOwnershipInfoService = /** @class */ (function (_super) {
         });
     };
     /**
+     * マイメンバーシップ検索
+     */
+    PersonOwnershipInfoService.prototype.searchMyMemberships = function (params) {
+        return __awaiter(this, void 0, void 0, function () {
+            var id;
+            var _this = this;
+            return __generator(this, function (_a) {
+                id = 'me';
+                return [2 /*return*/, this.fetch({
+                        uri: "/people/" + id + "/ownershipInfos",
+                        method: 'GET',
+                        qs: __assign(__assign({}, params), { typeOfGood: {
+                                issuedThrough: { typeOf: { $eq: factory.product.ProductType.MembershipService } }
+                            } }),
+                        expectedStatusCodes: [http_status_1.OK]
+                    })
+                        .then(function (response) { return __awaiter(_this, void 0, void 0, function () {
+                        var _a;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
+                                case 0:
+                                    _a = {};
+                                    return [4 /*yield*/, response.json()];
+                                case 1: return [2 /*return*/, (_a.data = _b.sent(),
+                                        _a)];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    /**
+     * マイ予約検索
+     */
+    PersonOwnershipInfoService.prototype.searchMyReservations = function (params) {
+        return __awaiter(this, void 0, void 0, function () {
+            var id;
+            var _this = this;
+            return __generator(this, function (_a) {
+                id = 'me';
+                return [2 /*return*/, this.fetch({
+                        uri: "/people/" + id + "/ownershipInfos",
+                        method: 'GET',
+                        qs: __assign(__assign({}, params), { typeOfGood: {
+                                issuedThrough: { typeOf: { $eq: factory.product.ProductType.EventService } }
+                            } }),
+                        expectedStatusCodes: [http_status_1.OK]
+                    })
+                        .then(function (response) { return __awaiter(_this, void 0, void 0, function () {
+                        var _a;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
+                                case 0:
+                                    _a = {};
+                                    return [4 /*yield*/, response.json()];
+                                case 1: return [2 /*return*/, (_a.data = _b.sent(),
+                                        _a)];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    /**
      * 所有権検索
      */
     PersonOwnershipInfoService.prototype.search = function (params) {
@@ -12950,7 +13026,7 @@ var PersonOwnershipInfoService = /** @class */ (function (_super) {
 }(service_1.Service));
 exports.PersonOwnershipInfoService = PersonOwnershipInfoService;
 
-},{"../../service":203,"http-status":264}],218:[function(require,module,exports){
+},{"../../factory":201,"../../service":203,"http-status":264}],218:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
