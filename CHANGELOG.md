@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
+- マイメンバーシップ検索を追加
+- マイ予約検索を追加
+
 ### Changed
 
 ### Deprecated
