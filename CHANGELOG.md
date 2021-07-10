@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v3.10.0 - 2021-07-10
+
+### Added
+
+- 決済URL発行サービスを追加
+
 ## v3.9.0 - 2021-07-09
 
 ### Added
