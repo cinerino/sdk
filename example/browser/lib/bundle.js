@@ -5872,6 +5872,25 @@ var PayAssetTransactionService = /** @class */ (function (_super) {
         });
     };
     /**
+     * 決済ロケーション発行
+     */
+    PayAssetTransactionService.prototype.publishPaymentUrl = function (params) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.fetch({
+                        uri: "/assetTransactions/" + factory.assetTransactionType.Pay + "/publishPaymentUrl",
+                        method: 'POST',
+                        body: params,
+                        expectedStatusCodes: [http_status_1.OK]
+                    })
+                        .then(function (response) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                        return [2 /*return*/, response.json()];
+                    }); }); })];
+            });
+        });
+    };
+    /**
      * 取引開始
      */
     PayAssetTransactionService.prototype.start = function (params) {
@@ -12363,6 +12382,25 @@ var PaymentService = /** @class */ (function (_super) {
                         uri: "/payment/" + factory.product.ProductType.PaymentCard + "/authorize",
                         method: 'POST',
                         expectedStatusCodes: [http_status_1.CREATED],
+                        body: params
+                    })
+                        .then(function (response) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                        return [2 /*return*/, response.json()];
+                    }); }); })];
+            });
+        });
+    };
+    /**
+     * 決済ロケーション発行
+     */
+    PaymentService.prototype.publishCreditCardPaymentUrl = function (params) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.fetch({
+                        uri: "/payment/" + factory.service.paymentService.PaymentServiceType.CreditCard + "/publishPaymentUrl",
+                        method: 'POST',
+                        expectedStatusCodes: [http_status_1.OK],
                         body: params
                     })
                         .then(function (response) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
