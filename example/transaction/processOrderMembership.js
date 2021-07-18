@@ -133,6 +133,14 @@ async function main() {
     });
     console.log('product offer authorized. id:', productOfferAuthorization.id);
 
+    // await offerService.voidAuthorization({
+    //     id: productOfferAuthorization.id,
+    //     object: { itemOffered: { typeOf: client.factory.product.ProductType.Product } },
+    //     purpose: { typeOf: transaction.typeOf, id: transaction.id }
+
+    // });
+    // return;
+
     // クレジットカード決済承認
     console.log('authorizing credit card payment...');
     const amount = acceptedOffer.priceSpecification.priceComponent[0].price;
