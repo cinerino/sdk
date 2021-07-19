@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v3.10.6 - 2021-07-19
+
+### Changed
+
+- 外部決済URL発行パラメータ調整
+
 ## v3.10.5 - 2021-07-19
 
 ### Changed
